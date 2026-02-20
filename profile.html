@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>我的 - GameTopUp</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary-color: #6C63FF;
+      --secondary-color: #FF6584;
+      --light-color: #F8F9FA;
+      --text-dark: #333;
+      --text-light: #666;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--light-color);
+      color: var(--text-dark);
+      padding-bottom: 70px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+
+    /* 头部 */
+    .header {
+      background: white;
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+    .header-title { font-size: 1.2rem; font-weight: 700; text-align: center; }
+
+    /* 用户信息卡片 */
+    .user-card {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: var(--radius-lg);
+      padding: 30px 20px;
+      margin: 20px;
+      color: white;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+    }
+    .user-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: white;
+      color: var(--primary-color);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 15px;
+      font-weight: 700;
+    }
+    .user-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
+    .user-id { font-size: 0.9rem; opacity: 0.9; }
+    .login-btn {
+      margin-top: 15px;
+      padding: 8px 30px;
+      background: white;
+      color: var(--primary-color);
+      border: none;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* 登录表单 */
+    .login-form {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin: 20px;
+      box-shadow: var(--shadow-sm);
+      display: none;
+    }
+    .login-form.show { display: block; }
+    .input-group { margin-bottom: 15px; }
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* 菜单列表 */
+    .menu-list {
+      background: white;
+      border-radius: var(--radius-lg);
+      margin: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .menu-item {
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item:hover { background: #f8f9fa; }
+    .menu-left { display: flex; align-items: center; gap: 15px; }
+    .menu-icon {
+      width: 35px; height: 35px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .menu-icon.orders { background: #e3f2fd; color: #1976d2; }
+    .menu-icon.support { background: #fff3e0; color: #f57c00; }
+    .menu-icon.settings { background: #f3e5f5; color: #7b1fa2; }
+    .menu-text { font-weight: 500; }
+    .menu-arrow { color: var(--text-light); }
+
+    /* 底部导航 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 5px 15px;
+    }
+    .nav-item.active { color: var(--primary-color); }
+    .nav-item i { font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header-title">个人中心</div>
+    </div>
+  </header>
+
+  <!-- 用户信息 -->
+  <div class="user-card" id="userCard">
+    <div class="user-avatar" id="userAvatar">👤</div>
+    <div class="user-name" id="userName">未登录</div>
+    <div class="user-id" id="userId">登录后享受专属服务</div>
+    <button class="login-btn" id="loginBtn" onclick="showLogin()">立即登录</button>
+    <button class="login-btn" id="logoutBtn" onclick="logout()" style="display: none; background: #ffebee; color: #c62828;">退出登录</button>
+  </div>
+
+  <!-- 登录表单 -->
+  <div class="login-form" id="loginForm">
+    <div class="input-group">
+      <input type="text" class="input-field" id="loginUsername" placeholder="请输入用户名">
+    </div>
+    <div class="input-group">
+      <input type="password" class="input-field" id="loginPassword" placeholder="请输入密码（任意）">
+    </div>
+    <button class="submit-btn" onclick="submitLogin()">登录</button>
+  </div>
+
+  <!-- 功能菜单 -->
+  <div class="menu-list">
+    <div class="menu-item" onclick="window.location.href='orders.html'">
+      <div class="menu-left">
+        <div class="menu-icon orders"><i class="fas fa-receipt"></i></div>
+        <div class="menu-text">我的订单</div>
+      </div>
+      <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+    </div>
+    <div class="menu-item">
+      <div class="menu-left">
+        <div class="menu-icon support"><i class="fas fa-headset"></i></div>
+        <div class="menu-text">客服支持</div>
+      </div>
+      <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+    </div>
+    <div class="menu-item">
+      <div class="menu-left">
+        <div class="menu-icon settings"><i class="fas fa-cog"></i></div>
+        <div class="menu-text">设置</div>
+      </div>
+      <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+    </div>
+  </div>
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <div class="nav-item" onclick="window.location.href='index.html'">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="nav-item" onclick="window.location.href='cart.html'">
+      <i class="fas fa-shopping-cart"></i>
+      <span>购物车</span>
+    </div>
+    <div class="nav-item active">
+      <i class="fas fa-user"></i>
+      <span>我的</span>
+    </div>
+  </nav>
+
+  <script>
+    // 初始化
+    function initPage() {
+      checkLoginStatus();
+    }
+
+    // 检查登录状态
+    function checkLoginStatus() {
+      const user = localStorage.getItem('gameTopUpUser');
+      if (user) {
+        const userInfo = JSON.parse(user);
+        document.getElementById('userName').textContent = userInfo.username;
+        document.getElementById('userId').textContent = 'ID: ' + userInfo.id;
+        document.getElementById('userAvatar').textContent = userInfo.username.charAt(0).toUpperCase();
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        document.getElementById('loginForm').classList.remove('show');
+      } else {
+        document.getElementById('userName').textContent = '未登录';
+        document.getElementById('userId').textContent = '登录后享受专属服务';
+        document.getElementById('userAvatar').textContent = '👤';
+        document.getElementById('loginBtn').style.display = 'inline-block';
+        document.getElementById('logoutBtn').style.display = 'none';
+      }
+    }
+
+    // 显示登录表单
+    window.showLogin = function() {
+      document.getElementById('loginForm').classList.add('show');
+    }
+
+    // 提交登录
+    window.submitLogin = function() {
+      const username = document.getElementById('loginUsername').value.trim();
+      if (!username) {
+        alert('⚠️ 请输入用户名');
+        return;
+      }
+      const userInfo = {
+        username: username,
+        id: 'U' + Date.now().toString().slice(-6),
+        loginTime: new Date().toISOString()
+      };
+      localStorage.setItem('gameTopUpUser', JSON.stringify(userInfo));
+      document.getElementById('loginForm').classList.remove('show');
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      checkLoginStatus();
+      alert('✅ 登录成功！');
+    }
+
+    // 退出登录
+    window.logout = function() {
+      if (confirm('确定要退出登录吗？')) {
+        localStorage.removeItem('gameTopUpUser');
+        checkLoginStatus();
+        alert('👋 已退出登录');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>
