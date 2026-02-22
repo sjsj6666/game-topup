@@ -2,845 +2,438 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>原神充值 - GameTopUp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="seo.detail.title">游戏详情 - GameTopUp</title>
+  <meta name="description" data-i18n="seo.detail.desc" content="查看游戏详情和充值套餐">
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="translations.js"></script>
+  <script src="i18n.js"></script>
+  <script src="seo-loader.js"></script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --primary-color: #6C63FF;
       --secondary-color: #FF6584;
-      --accent-color: #36D1DC;
-      --dark-color: #1A1A2E;
-      --light-color: #F8F9FA;
-      --success-color: #28A745;
-      --warning-color: #FFC107;
+      --bg-color: #F8F9FA;
+      --card-bg: #FFFFFF;
       --text-dark: #333;
       --text-light: #666;
-      --text-muted: #999;
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-      --shadow-lg: 0 10px 20px rgba(0,0,0,0.1);
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
     }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background-color: var(--light-color);
-      color: var(--text-dark);
-      line-height: 1.6;
-      padding-bottom: 80px;
+    [data-theme="dark"] {
+      --bg-color: #1A1A2E;
+      --card-bg: #16213E;
+      --text-dark: #E8E8E8;
+      --text-light: #A0A0A0;
     }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 80px; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
-
-    /* 返回按钮 */
-    .back-header {
-      background: white;
-      padding: 15px 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: var(--shadow-sm);
-    }
-    .back-btn {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: none;
-      border: none;
-      font-size: 16px;
-      color: var(--text-dark);
-      cursor: pointer;
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
-      transition: background-color 0.3s;
-    }
-    .back-btn:hover { background-color: #f0f0f0; }
-
-    /* 游戏头图 */
-    .game-hero {
-      position: relative;
-      height: 300px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      overflow: hidden;
-      margin-bottom: -50px;
-    }
-    .game-hero-content {
-      position: absolute;
-      bottom: 30px;
-      left: 20px;
-      right: 20px;
-      color: white;
-      z-index: 2;
-    }
-    .game-hero-title {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-    .game-hero-subtitle {
-      font-size: 1rem;
-      opacity: 0.9;
-      margin-bottom: 15px;
-    }
-    .game-hero-rating {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .rating-stars { color: #FFD700; }
-    .download-count { font-size: 0.9rem; opacity: 0.8; }
-    .game-hero-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 100px;
-      background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
-      z-index: 1;
-    }
-
-    /* 游戏信息卡片 */
-    .game-info-card {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      margin: 20px;
-      box-shadow: var(--shadow-md);
-      position: relative;
-      z-index: 3;
-    }
-    .game-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 15px;
-    }
-    .game-tag {
-      background: #f0f0f0;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      color: var(--text-light);
-    }
-    .game-tag.hot {
-      background: #ffeaea;
-      color: var(--secondary-color);
-    }
-    .game-description {
-      margin-bottom: 20px;
-      color: var(--text-light);
-      line-height: 1.8;
-    }
-
-    /* 充值套餐区 */
-    .packages-section { margin: 20px; }
-    .section-title {
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 15px;
-      color: var(--text-dark);
-    }
-    .package-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .package-item {
-      background: white;
-      border-radius: var(--radius-md);
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow-sm);
-      cursor: pointer;
-      transition: all 0.3s;
-      border: 2px solid transparent;
-    }
-    .package-item:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-    .package-item.selected {
-      border-color: var(--primary-color);
-      background-color: rgba(108, 99, 255, 0.05);
-    }
-    .package-left { flex: 1; }
-    .package-title {
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-    .package-desc {
-      font-size: 0.9rem;
-      color: var(--text-light);
-    }
-    .package-right { text-align: right; }
-    .package-price {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--primary-color);
-    }
-    .package-original {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      text-decoration: line-through;
-    }
-    .package-badge {
-      display: inline-block;
-      background: var(--secondary-color);
-      color: white;
-      padding: 2px 8px;
-      border-radius: var(--radius-sm);
-      font-size: 0.7rem;
-      margin-left: 5px;
-    }
-
-    /* 数量选择 */
-    .quantity-section {
-      margin: 20px;
-      background: white;
-      border-radius: var(--radius-md);
-      padding: 15px;
-      box-shadow: var(--shadow-sm);
-    }
-    .quantity-control {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-    }
-    .quantity-label { font-weight: 500; }
-    .quantity-input {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    .quantity-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1px solid #ddd;
-      background: white;
-      font-size: 1.2rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
-    }
-    .quantity-btn:hover { background: #f5f5f5; }
-    .quantity-value {
-      font-size: 1.2rem;
-      font-weight: 600;
-      min-width: 40px;
-      text-align: center;
-    }
-
-    /* 总计 */
-    .total-section {
-      margin: 20px;
-      background: white;
-      border-radius: var(--radius-md);
-      padding: 15px;
-      box-shadow: var(--shadow-sm);
-    }
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
+    .back-header { background: var(--card-bg); padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .back-btn { background: none; border: none; font-size: 16px; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; gap: 10px; }
+    .game-hero { position: relative; height: 300px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-bottom: -50px; }
+    .game-hero-content { position: absolute; bottom: 30px; left: 20px; color: white; }
+    .game-hero-title { font-size: 2rem; font-weight: 700; margin-bottom: 5px; }
+    .game-info-card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .game-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+    .game-tag { background: #f0f0f0; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: var(--text-light); }
+    .game-description { color: var(--text-light); line-height: 1.8; margin-bottom: 20px; }
+    .section-title { font-size: 1.4rem; font-weight: 600; margin-bottom: 15px; }
+    .package-list { display: flex; flex-direction: column; gap: 12px; }
+    .package-item { background: var(--card-bg); border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); cursor: pointer; border: 2px solid transparent; }
+    .package-item:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+    .package-item.selected { border-color: var(--primary-color); background-color: rgba(108, 99, 255, 0.05); }
+    .package-title { font-weight: 600; margin-bottom: 5px; }
+    .package-desc { font-size: 0.9rem; color: var(--text-light); }
+    .package-price { font-size: 1.2rem; font-weight: 700; color: var(--primary-color); }
+    .package-original { font-size: 0.9rem; color: var(--text-light); text-decoration: line-through; }
+    .package-badge { display: inline-block; background: var(--secondary-color); color: white; padding: 2px 8px; border-radius: var(--radius-sm); font-size: 0.7rem; margin-left: 5px; }
+    .quantity-section { background: var(--card-bg); border-radius: 12px; padding: 15px; margin: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .quantity-control { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+    .quantity-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #ddd; background: var(--card-bg); font-size: 1.2rem; cursor: pointer; }
+    .quantity-value { font-size: 1.2rem; font-weight: 600; min-width: 40px; text-align: center; }
+    .total-section { background: var(--card-bg); border-radius: 12px; padding: 15px; margin: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .total-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
     .total-label { color: var(--text-light); }
     .total-value { font-weight: 600; }
-    .total-final {
-      border-top: 1px solid #eee;
-      padding-top: 10px;
-      margin-top: 10px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--primary-color);
-    }
-
-    /* 支付方式 */
+    .total-final { border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; font-size: 1.2rem; font-weight: 700; color: var(--primary-color); }
     .payment-section { margin: 20px; }
-    .payment-methods {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .payment-method {
-      background: white;
-      border-radius: var(--radius-sm);
-      padding: 15px;
-      text-align: center;
-      border: 2px solid #eee;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
+    .payment-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+    .payment-method { background: var(--card-bg); border-radius: var(--radius-sm); padding: 15px; text-align: center; border: 2px solid #eee; cursor: pointer; transition: all 0.3s; }
     .payment-method:hover { border-color: var(--primary-color); }
-    .payment-method.selected {
-      border-color: var(--primary-color);
-      background-color: rgba(108, 99, 255, 0.05);
-    }
-    .payment-icon {
-      font-size: 1.5rem;
-      margin-bottom: 8px;
-    }
-    .payment-name {
-      font-size: 0.9rem;
-      color: var(--text-dark);
-    }
-
-    /* 用户评价 */
+    .payment-method.selected { border-color: var(--primary-color); background-color: rgba(108, 99, 255, 0.05); }
+    .payment-icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .payment-name { font-size: 0.9rem; color: var(--text-dark); }
     .reviews-section { margin: 20px; }
     .review-list { margin-top: 15px; }
-    .review-item {
-      background: white;
-      border-radius: var(--radius-md);
-      padding: 15px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow-sm);
-    }
-    .review-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .review-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      margin-right: 10px;
-    }
+    .review-item { background: var(--card-bg); border-radius: var(--radius-md); padding: 15px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
+    .review-header { display: flex; align-items: center; margin-bottom: 10px; }
+    .review-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; margin-right: 10px; }
     .review-info { flex: 1; }
     .review-name { font-weight: 600; margin-bottom: 2px; }
     .review-date { font-size: 0.8rem; color: var(--text-muted); }
     .review-stars { color: #FFD700; font-size: 0.9rem; }
-    .review-content {
-      color: var(--text-light);
-      line-height: 1.6;
-    }
-
-    /* 固定底部按钮 */
-    .action-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      padding: 15px 20px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-      z-index: 1000;
-      display: flex;
-      gap: 15px;
-    }
-    .action-btn {
-      flex: 1;
-      padding: 15px;
-      border-radius: var(--radius-lg);
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.3s;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-cart {
-      background: #f8f9fa;
-      color: var(--text-dark);
-      border: 1px solid #ddd;
-    }
+    .review-content { color: var(--text-light); line-height: 1.6; }
+    .action-footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; display: flex; gap: 15px; }
+    .action-btn { flex: 1; padding: 15px; border-radius: var(--radius-lg); font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-cart { background: #f8f9fa; color: var(--text-dark); border: 1px solid #ddd; }
     .btn-cart:hover { background: #e9ecef; }
-    .btn-buy {
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-      color: white;
-      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
-    }
-    .btn-buy:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
-    }
-
-    /* 响应式调整 */
+    .btn-buy { background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white; box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3); }
+    .btn-buy:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4); }
+    .loading { text-align: center; padding: 40px; color: var(--text-light); }
+    .loading i { font-size: 2rem; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     @media (min-width: 768px) {
-      .container {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 20px;
-        padding: 20px;
-      }
+      .container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; padding: 20px; }
       .main-content { grid-column: 1; }
       .sidebar { grid-column: 2; }
-      .game-hero {
-        height: 400px;
-        border-radius: var(--radius-lg);
-        margin: 20px 20px -100px 20px;
-      }
-      .game-info-card,
-      .packages-section,
-      .quantity-section,
-      .total-section,
-      .payment-section,
-      .reviews-section {
-        margin: 0 0 20px 0;
-      }
+      .game-hero { height: 400px; border-radius: var(--radius-lg); margin: 20px 20px -100px 20px; }
+      .game-info-card, .packages-section, .quantity-section, .total-section, .payment-section, .reviews-section { margin: 0 0 20px 0; }
       .action-footer { display: none; }
-      .desktop-actions {
-        display: block;
-        position: sticky;
-        top: 100px;
-      }
+      .desktop-actions { display: block; position: sticky; top: 100px; }
     }
     .desktop-actions { display: none; }
   </style>
 </head>
 <body>
-  <!-- 返回头部 -->
   <header class="back-header">
     <div class="container">
-      <button class="back-btn" id="backBtn">
-        <i class="fas fa-arrow-left"></i> 返回首页
+      <button class="back-btn" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i> <span data-i18n="common.back">返回</span>
       </button>
     </div>
   </header>
 
-  <!-- 游戏头图 -->
-  <section class="game-hero">
+  <section class="game-hero" id="gameHero">
     <div class="game-hero-content">
-      <h1 class="game-hero-title">原神 Genshin Impact</h1>
-      <p class="game-hero-subtitle">开放世界冒险 RPG</p>
-      <div class="game-hero-rating">
-        <div class="rating-stars">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star-half-alt"></i>
-        </div>
-        <span class="download-count">200 万 + 玩家选择</span>
-      </div>
+      <h1 class="game-hero-title" id="gameTitle" data-i18n="detail.loading">加载中...</h1>
     </div>
-    <div class="game-hero-overlay"></div>
   </section>
 
   <div class="container">
-    <!-- 主内容区 -->
     <div class="main-content">
-      <!-- 游戏信息卡片 -->
       <div class="game-info-card">
-        <div class="game-tags">
-          <span class="game-tag hot">🔥 新年特惠</span>
-          <span class="game-tag">开放世界</span>
-          <span class="game-tag">角色扮演</span>
-          <span class="game-tag">多平台</span>
-        </div>
-        <div class="game-description">
-          在提瓦特大陆的奇幻世界中展开冒险。探索广阔的世界，组建强大的角色队伍，体验史诗级的剧情故事。现在充值创世结晶可享受新年特别优惠，更有额外原石赠送！
-        </div>
+        <div class="game-tags" id="gameTags"></div>
+        <div class="game-description" id="gameDescription"></div>
         <div class="game-features">
           <div style="display: flex; align-items: center; margin-bottom: 10px;">
             <i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 8px;"></i>
-            <span>官方渠道 安全靠谱</span>
+            <span data-i18n="detail.feature.official">官方渠道 安全靠谱</span>
           </div>
           <div style="display: flex; align-items: center; margin-bottom: 10px;">
             <i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 8px;"></i>
-            <span>秒速到账 无需等待</span>
+            <span data-i18n="detail.feature.fast">秒速到账 无需等待</span>
           </div>
           <div style="display: flex; align-items: center;">
             <i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 8px;"></i>
-            <span>7×24 小时 客服支持</span>
+            <span data-i18n="detail.feature.support">7×24 小时 客服支持</span>
           </div>
         </div>
       </div>
 
-      <!-- 充值套餐 -->
       <div class="packages-section">
-        <h2 class="section-title">💰 充值套餐</h2>
+        <h2 class="section-title" data-i18n="detail.packages.title">💰 充值套餐</h2>
         <div class="package-list" id="packageList">
-          <!-- 套餐将通过 JS 动态生成 -->
+          <div class="loading"><i class="fas fa-spinner"></i><p data-i18n="common.loading">加载套餐中...</p></div>
         </div>
       </div>
 
-      <!-- 数量选择 -->
       <div class="quantity-section">
         <div class="quantity-control">
-          <div class="quantity-label">购买数量</div>
+          <div class="quantity-label" data-i18n="detail.quantity.label">购买数量</div>
           <div class="quantity-input">
-            <button class="quantity-btn" id="quantityMinus">-</button>
+            <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
             <span class="quantity-value" id="quantityValue">1</span>
-            <button class="quantity-btn" id="quantityPlus">+</button>
+            <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
           </div>
         </div>
-        <div style="font-size: 0.9rem; color: var(--text-light);">
-          注：部分套餐有购买数量限制
-        </div>
+        <div style="font-size: 0.9rem; color: var(--text-light);" data-i18n="detail.quantity.note">注：部分套餐有购买数量限制</div>
       </div>
 
-      <!-- 用户评价 -->
       <div class="reviews-section">
-        <h2 class="section-title">⭐ 用户评价</h2>
-        <div class="review-list">
-          <!-- 评价将通过 JS 动态生成 -->
-        </div>
+        <h2 class="section-title" data-i18n="detail.reviews.title">⭐ 用户评价</h2>
+        <div class="review-list" id="reviewList"></div>
       </div>
     </div>
 
-    <!-- 侧边栏（桌面端） -->
     <div class="sidebar">
-      <!-- 总计 -->
       <div class="total-section desktop-actions">
         <div class="total-row">
-          <span class="total-label">套餐单价</span>
-          <span class="total-value" id="totalPackage">¥6.00</span>
+          <span class="total-label" data-i18n="detail.total.packagePrice">套餐单价</span>
+          <span class="total-value" id="totalPackage">¥0.00</span>
         </div>
         <div class="total-row">
-          <span class="total-label">购买数量</span>
+          <span class="total-label" data-i18n="detail.total.quantity">购买数量</span>
           <span class="total-value" id="totalQuantity">×1</span>
         </div>
         <div class="total-row">
-          <span class="total-label">优惠折扣</span>
+          <span class="total-label" data-i18n="detail.total.discount">优惠折扣</span>
           <span class="total-value" id="totalDiscount">-¥0.00</span>
         </div>
         <div class="total-row total-final">
-          <span>应付总额</span>
-          <span id="totalAmount">¥6.00</span>
+          <span data-i18n="detail.total.label">应付总额</span>
+          <span id="totalAmount">¥0.00</span>
         </div>
 
-        <!-- 支付方式 -->
         <div style="margin-top: 20px;">
-          <div class="section-title" style="font-size: 1.1rem;">支付方式</div>
+          <div class="section-title" style="font-size: 1.1rem;" data-i18n="detail.payment.title">支付方式</div>
           <div class="payment-methods">
             <div class="payment-method selected" data-method="alipay">
               <div class="payment-icon"><i class="fab fa-alipay"></i></div>
-              <div class="payment-name">支付宝</div>
+              <div class="payment-name" data-i18n="detail.payment.alipay">支付宝</div>
             </div>
             <div class="payment-method" data-method="wechat">
               <div class="payment-icon"><i class="fab fa-weixin"></i></div>
-              <div class="payment-name">微信支付</div>
+              <div class="payment-name" data-i18n="detail.payment.wechat">微信支付</div>
             </div>
             <div class="payment-method" data-method="paypal">
               <div class="payment-icon"><i class="fab fa-paypal"></i></div>
-              <div class="payment-name">PayPal</div>
+              <div class="payment-name" data-i18n="detail.payment.paypal">PayPal</div>
             </div>
           </div>
         </div>
 
-        <!-- 桌面端操作按钮 -->
         <div style="margin-top: 25px; display: flex; gap: 10px;">
-          <button class="action-btn btn-cart desktop-only" id="desktopCartBtn">
-            <i class="fas fa-shopping-cart"></i> 加入购物车
+          <button class="action-btn btn-cart desktop-only" id="desktopCartBtn" onclick="addToCart()">
+            <i class="fas fa-shopping-cart"></i> <span data-i18n="detail.btn.cart">加入购物车</span>
           </button>
-          <button class="action-btn btn-buy desktop-only" id="desktopBuyBtn">
-            <i class="fas fa-bolt"></i> 立即购买
+          <button class="action-btn btn-buy desktop-only" id="desktopBuyBtn" onclick="buyNow()">
+            <i class="fas fa-bolt"></i> <span data-i18n="detail.btn.buy">立即购买</span>
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 移动端底部操作栏 -->
   <div class="action-footer">
-    <button class="action-btn btn-cart" id="mobileCartBtn">
-      <i class="fas fa-shopping-cart"></i> 加入购物车
+    <button class="action-btn btn-cart" id="mobileCartBtn" onclick="addToCart()">
+      <i class="fas fa-shopping-cart"></i> <span data-i18n="detail.btn.cart">加入购物车</span>
     </button>
-    <button class="action-btn btn-buy" id="mobileBuyBtn">
-      <i class="fas fa-bolt"></i> 立即购买
+    <button class="action-btn btn-buy" id="mobileBuyBtn" onclick="buyNow()">
+      <i class="fas fa-bolt"></i> <span data-i18n="detail.btn.buy">立即购买</span>
     </button>
   </div>
 
   <script>
-    // 🎮 游戏数据
-    const gamePackages = [
-      { id: 1, name: "60 创世结晶", description: "首充双倍，性价比之选", price: 6, originalPrice: 6, discount: 0, recommend: false },
-      { id: 2, name: "300 创世结晶", description: "月卡补充，日常必备", price: 30, originalPrice: 30, discount: 0, recommend: false },
-      { id: 3, name: "980 创世结晶", description: "角色抽取，心愿单首选", price: 98, originalPrice: 98, discount: 0, recommend: true },
-      { id: 4, name: "1980 创世结晶", description: "武器锻造，进阶之选", price: 198, originalPrice: 198, discount: 0, recommend: true },
-      { id: 5, name: "3280 创世结晶", description: "大额充值，最受欢迎", price: 328, originalPrice: 328, discount: 0, recommend: true },
-      { id: 6, name: "6480 创世结晶", description: "限时特惠，送 1600 原石", price: 648, originalPrice: 864, discount: 216, badge: "25% OFF", recommend: true }
-    ];
-
-    // 用户评价数据
-    const userReviews = [
-      { name: "旅行者 A", date: "2026-02-18", rating: 5, content: "充值秒到账，还有额外原石赠送，太划算了！已经第二次购买了，服务很稳定。" },
-      { name: "刻晴真爱党", date: "2026-02-15", rating: 5, content: "为了抽刻晴的专武，买了 6480 套餐，真的比官方充值便宜很多，支持！" },
-      { name: "新手玩家 B", date: "2026-02-10", rating: 4, content: "第一次在第三方平台充值，还有点担心，但体验很好，5 分钟就到账了。" },
-      { name: "资深玩家 C", date: "2026-02-05", rating: 5, content: "长期在这里充值，比其他平台靠谱，客服回复也及时，推荐给朋友了。" }
-    ];
-
-    // 购物车和订单数据
+    let currentGame = null;
+    let packages = [];
     let selectedPackage = null;
     let quantity = 1;
-    let paymentMethod = "alipay";
+    let paymentMethod = 'alipay';
 
-    // DOM 元素（添加空值检查）
-    const backBtn = document.getElementById('backBtn');
-    const packageList = document.getElementById('packageList');
-    const quantityValue = document.getElementById('quantityValue');
-    const quantityMinus = document.getElementById('quantityMinus');
-    const quantityPlus = document.getElementById('quantityPlus');
-    const totalPackage = document.getElementById('totalPackage');
-    const totalQuantity = document.getElementById('totalQuantity');
-    const totalDiscount = document.getElementById('totalDiscount');
-    const totalAmount = document.getElementById('totalAmount');
-    const mobileCartBtn = document.getElementById('mobileCartBtn');
-    const mobileBuyBtn = document.getElementById('mobileBuyBtn');
-    const desktopCartBtn = document.getElementById('desktopCartBtn');
-    const desktopBuyBtn = document.getElementById('desktopBuyBtn');
+    async function loadGameDetail() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const gameId = urlParams.get('game');
+      
+      if (!gameId) { alert('游戏不存在'); window.location.href = 'index.html'; return; }
 
-    // 🔧 安全获取 localStorage（修复 file:// 协议问题）
-    function safeGetStorage(key, defaultValue) {
       try {
-        const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : defaultValue;
-      } catch (e) {
-        console.warn('localStorage 不可用，使用内存存储', e);
-        return defaultValue;
+        const { data, error } = await db.from('games').select('*').eq('id', gameId).eq('active', true).single();
+        
+        if (error || !data) {
+          const sampleGame = getSampleGame(gameId);
+          if (sampleGame) {
+            renderGame(sampleGame);
+            await loadPackages(gameId);
+            renderReviews(getSampleReviews(gameId));
+            if (typeof updateGameSEO === 'function') updateGameSEO(sampleGame);
+          } else {
+            alert('游戏不存在');
+            window.location.href = 'index.html';
+          }
+          return;
+        }
+
+        renderGame(data);
+        await loadPackages(gameId);
+        if (data.reviews) renderReviews(data.reviews);
+        else renderReviews(getSampleReviews(gameId));
+        if (typeof updateGameSEO === 'function') updateGameSEO(data);
+
+      } catch (err) {
+        console.error('加载游戏失败:', err);
+        alert('加载失败，请刷新重试');
       }
     }
 
-    function safeSetStorage(key, value) {
+    function renderGame(game) {
+      currentGame = game;
+      if (game.gradient) document.getElementById('gameHero').style.background = game.gradient;
+      document.getElementById('gameTitle').textContent = game.name;
+      if (game.category) {
+        document.getElementById('gameTags').innerHTML = `<span class="game-tag hot">🔥 ${t('home.category.hot')}</span>` + 
+          game.category.map(cat => `<span class="game-tag">${cat}</span>`).join('');
+      }
+      document.getElementById('gameDescription').textContent = game.description || '';
+    }
+
+    async function loadPackages(gameId) {
       try {
-        localStorage.setItem(key, JSON.stringify(value));
-        return true;
-      } catch (e) {
-        console.warn('localStorage 保存失败', e);
-        alert('⚠️ 注意：由于浏览器限制，购物车数据可能无法保存。建议使用本地服务器运行。');
-        return false;
+        const { data, error } = await db.from('packages').select('*').eq('game_id', gameId).eq('active', true).order('price', { ascending: true });
+        if (error) throw error;
+        packages = data || [];
+        if (packages.length === 0) packages = getSamplePackages(gameId);
+        renderPackages();
+        if (packages.length > 0) selectPackage(packages[0]);
+      } catch (err) {
+        console.error('加载套餐失败:', err);
+        document.getElementById('packageList').innerHTML = '<div class="loading">加载失败</div>';
       }
     }
 
-    // 初始化页面
-    function initPage() {
-      console.log('🔧 页面初始化开始...');
-      renderPackages();
-      renderReviews();
-      if (gamePackages.length > 0) selectPackage(gamePackages[0]);
-      initPaymentMethods();
-      updateOrderTotal();
-      console.log('✅ 页面初始化完成');
-    }
-
-    // 渲染套餐列表
     function renderPackages() {
-      if (!packageList) {
-        console.error('❌ packageList 元素未找到');
+      const list = document.getElementById('packageList');
+      if (packages.length === 0) {
+        list.innerHTML = '<div class="loading">暂无套餐</div>';
         return;
       }
-      packageList.innerHTML = '';
-      gamePackages.forEach(pkg => {
-        const packageItem = document.createElement('div');
-        packageItem.className = 'package-item';
-        packageItem.dataset.id = pkg.id;
-        let badgeHtml = pkg.badge ? `<span class="package-badge">${pkg.badge}</span>` : '';
-        let recommendHtml = pkg.recommend ? '<div style="font-size: 0.8rem; color: var(--secondary-color); margin-top: 3px;">🔥 推荐</div>' : '';
-        let originalPriceHtml = pkg.discount > 0 ? `<div class="package-original">¥${pkg.originalPrice.toFixed(2)}</div>` : '';
-        
-        packageItem.innerHTML = `
-          <div class="package-left">
-            <div class="package-title">${pkg.name}</div>
-            <div class="package-desc">${pkg.description}</div>
-            ${recommendHtml}
-          </div>
-          <div class="package-right">
-            <div class="package-price">¥${pkg.price.toFixed(2)}</div>
-            ${originalPriceHtml}
-            ${badgeHtml}
-          </div>
-        `;
-        packageItem.addEventListener('click', () => selectPackage(pkg));
-        packageList.appendChild(packageItem);
-      });
-    }
-
-    // 选择套餐
-    function selectPackage(pkg) {
-      selectedPackage = pkg;
-      document.querySelectorAll('.package-item').forEach(item => {
-        item.classList.remove('selected');
-        if (parseInt(item.dataset.id) === pkg.id) item.classList.add('selected');
-      });
-      updateOrderTotal();
-    }
-
-    // 渲染用户评价
-    function renderReviews() {
-      const reviewList = document.querySelector('.review-list');
-      if (!reviewList) return;
-      reviewList.innerHTML = '';
-      userReviews.forEach(review => {
-        const reviewItem = document.createElement('div');
-        reviewItem.className = 'review-item';
-        let starsHtml = '';
-        for (let i = 0; i < 5; i++) {
-          if (i < Math.floor(review.rating)) starsHtml += '<i class="fas fa-star"></i>';
-          else if (i === Math.floor(review.rating) && review.rating % 1 !== 0) starsHtml += '<i class="fas fa-star-half-alt"></i>';
-          else starsHtml += '<i class="far fa-star"></i>';
-        }
-        const avatarLetter = review.name.charAt(0);
-        reviewItem.innerHTML = `
-          <div class="review-header">
-            <div class="review-avatar">${avatarLetter}</div>
-            <div class="review-info">
-              <div class="review-name">${review.name}</div>
-              <div class="review-date">${review.date}</div>
+      list.innerHTML = packages.map(pkg => {
+        const badgeHtml = pkg.badge ? `<span class="package-badge">${pkg.badge}</span>` : '';
+        const recommendHtml = pkg.recommend ? `<div style="font-size: 0.8rem; color: var(--secondary-color); margin-top: 3px;">🔥 ${t('home.category.hot')}</div>` : '';
+        const originalPriceHtml = pkg.original_price && pkg.original_price > pkg.price ? `<div class="package-original">${SITE_CONFIG?.currency || '¥'}${pkg.original_price}</div>` : '';
+        return `
+          <div class="package-item" data-id="${pkg.id}">
+            <div class="package-left">
+              <div class="package-title">${pkg.name} ${badgeHtml}</div>
+              <div class="package-desc">${pkg.description || ''}</div>
+              ${recommendHtml}
             </div>
-            <div class="review-stars">${starsHtml}</div>
+            <div class="package-right">
+              <div class="package-price">${SITE_CONFIG?.currency || '¥'}${pkg.price}</div>
+              ${originalPriceHtml}
+            </div>
           </div>
-          <div class="review-content">${review.content}</div>
         `;
-        reviewList.appendChild(reviewItem);
-      });
-    }
-
-    // 初始化支付方式
-    function initPaymentMethods() {
-      const paymentMethods = document.querySelectorAll('.payment-method');
-      paymentMethods.forEach(method => {
-        method.addEventListener('click', () => {
-          paymentMethods.forEach(m => m.classList.remove('selected'));
-          method.classList.add('selected');
-          paymentMethod = method.dataset.method;
+      }).join('');
+      list.querySelectorAll('.package-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const pkgId = parseInt(item.dataset.id);
+          const pkg = packages.find(p => p.id === pkgId);
+          if (pkg) selectPackage(pkg);
         });
       });
     }
 
-    // 更新订单总计
-    function updateOrderTotal() {
+    function selectPackage(pkg) {
+      selectedPackage = pkg;
+      document.getElementById('packageList').querySelectorAll('.package-item').forEach(item => {
+        item.classList.remove('selected');
+        if (parseInt(item.dataset.id) === pkg.id) item.classList.add('selected');
+      });
+      updateTotal();
+    }
+
+    function changeQuantity(delta) {
+      quantity = Math.max(1, quantity + delta);
+      document.getElementById('quantityValue').textContent = quantity;
+      updateTotal();
+    }
+
+    function updateTotal() {
       if (!selectedPackage) return;
-      const packagePrice = selectedPackage.price;
-      const originalPrice = selectedPackage.originalPrice || packagePrice;
-      const discount = originalPrice - packagePrice;
-      const total = packagePrice * quantity;
-      const totalDiscountAmount = discount * quantity;
-      
-      if (totalPackage) totalPackage.textContent = `¥${packagePrice.toFixed(2)}`;
-      if (totalQuantity) totalQuantity.textContent = `×${quantity}`;
-      if (totalDiscount) totalDiscount.textContent = `-¥${totalDiscountAmount.toFixed(2)}`;
-      if (totalAmount) totalAmount.textContent = `¥${total.toFixed(2)}`;
+      const price = selectedPackage.price;
+      const originalPrice = selectedPackage.original_price || price;
+      const discount = originalPrice - price;
+      const total = price * quantity;
+      const totalDiscount = discount * quantity;
+      document.getElementById('totalPackage').textContent = `${SITE_CONFIG?.currency || '¥'}${price.toFixed(2)}`;
+      document.getElementById('totalQuantity').textContent = `×${quantity}`;
+      document.getElementById('totalDiscount').textContent = `-${SITE_CONFIG?.currency || '¥'}${totalDiscount.toFixed(2)}`;
+      document.getElementById('totalAmount').textContent = `${SITE_CONFIG?.currency || '¥'}${total.toFixed(2)}`;
     }
 
-    // 🔙 返回按钮功能（修复：直接跳转 index.html）
-    if (backBtn) {
-      backBtn.addEventListener('click', () => {
-        // 先尝试 history.back()
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          // 如果无历史记录，直接跳转首页
-          window.location.href = 'index.html';
-        }
-      });
-    }
-
-    // 数量控制
-    if (quantityMinus) {
-      quantityMinus.addEventListener('click', () => {
-        if (quantity > 1) { quantity--; if(quantityValue) quantityValue.textContent = quantity; updateOrderTotal(); }
-      });
-    }
-    if (quantityPlus) {
-      quantityPlus.addEventListener('click', () => {
-        quantity++; if(quantityValue) quantityValue.textContent = quantity; updateOrderTotal();
-      });
-    }
-
-    // 🛒 加入购物车功能（修复 localStorage 问题）
     function addToCart() {
-      if (!selectedPackage) { 
-        alert('⚠️ 请先选择充值套餐'); 
-        return; 
-      }
-      const cartItem = {
-        game: '原神 Genshin Impact',
-        package: selectedPackage,
-        quantity: quantity,
-        paymentMethod: paymentMethod,
-        total: selectedPackage.price * quantity
-      };
-      
-      let cart = safeGetStorage('gameTopUpCart', []);
+      if (!selectedPackage) { alert(t('notify.cart.select')); return; }
+      const cartItem = { gameId: currentGame?.id, gameName: currentGame?.name, package: selectedPackage, quantity: quantity, total: selectedPackage.price * quantity, addedAt: new Date().toISOString() };
+      let cart = JSON.parse(localStorage.getItem('gameTopUpCart') || '[]');
       cart.push(cartItem);
-      const success = safeSetStorage('gameTopUpCart', cart);
-      
-      if (success) {
-        showNotification('✅ 已成功添加到购物车！');
-        // 更新主页购物车角标
-        let cartCount = safeGetStorage('gameTopUpCartCount', 0);
-        safeSetStorage('gameTopUpCartCount', cartCount + 1);
-      }
+      localStorage.setItem('gameTopUpCart', JSON.stringify(cart));
+      const badge = document.getElementById('cartBadge');
+      if (badge) badge.textContent = cart.length;
+      alert(t('notify.cart.added'));
     }
 
-    // 💳 立即购买功能
     function buyNow() {
-      if (!selectedPackage) { 
-        alert('⚠️ 请先选择充值套餐'); 
-        return; 
+      if (!selectedPackage) { alert(t('notify.cart.select')); return; }
+      const orderData = { gameId: currentGame?.id, gameName: currentGame?.name, package: selectedPackage, quantity: quantity, total: selectedPackage.price * quantity, paymentMethod: paymentMethod };
+      sessionStorage.setItem('pendingOrder', JSON.stringify(orderData));
+      window.location.href = 'payment.html';
+    }
+
+    function renderReviews(reviews) {
+      const list = document.getElementById('reviewList');
+      if (!reviews || reviews.length === 0) {
+        list.innerHTML = '<div style="text-align: center; color: var(--text-light); padding: 20px;">暂无评价</div>';
+        return;
       }
-      const orderData = {
-        game: '原神 Genshin Impact',
-        package: selectedPackage,
-        quantity: quantity,
-        paymentMethod: paymentMethod,
-        total: selectedPackage.price * quantity,
-        orderId: 'ORD' + Date.now(),
-        date: new Date().toISOString()
+      list.innerHTML = reviews.map(review => {
+        const avatarLetter = review.name?.charAt(0) || 'U';
+        return `
+          <div class="review-item">
+            <div class="review-header">
+              <div class="review-avatar">${avatarLetter}</div>
+              <div class="review-info">
+                <div class="review-name">${review.name}</div>
+                <div class="review-date">${review.date || ''}</div>
+              </div>
+              <div class="review-stars">${generateStars(review.rating || 5)}</div>
+            </div>
+            <div class="review-content">${review.content || ''}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function generateStars(rating) {
+      const full = Math.floor(rating);
+      const half = rating % 1 >= 0.5 ? 1 : 0;
+      const empty = 5 - full - half;
+      return `${'<i class="fas fa-star"></i>'.repeat(full)}${half ? '<i class="fas fa-star-half-alt"></i>' : ''}${'<i class="far fa-star"></i>'.repeat(empty)}`;
+    }
+
+    function getSampleGame(gameId) {
+      const games = {
+        'genshin': { id: 'genshin', name: '原神', name_en: 'Genshin Impact', description: '在提瓦特大陆的奇幻世界中展开冒险', category: ['开放世界', '角色扮演'], rating: 4.8, downloads: '200 万+', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', price: 6 },
+        'honor': { id: 'honor', name: '王者荣耀', name_en: 'Honor of Kings', description: '5V5 团队公平竞技手游', category: ['MOBA', '5V5'], rating: 4.7, downloads: '500 万+', gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', price: 1 },
+        'starrail': { id: 'starrail', name: '崩坏：星穹铁道', name_en: 'Honkai Star Rail', description: '银河冒险策略游戏', category: ['策略', '回合制'], rating: 4.9, downloads: '150 万+', gradient: 'linear-gradient(135deg, #834d9b 0%, #d04ed6 100%)', price: 6 }
       };
-      
-      let orders = safeGetStorage('gameTopUpOrders', []);
-      orders.push(orderData);
-      safeSetStorage('gameTopUpOrders', orders);
-      
-      alert(`🎉 订单创建成功！\n订单号：${orderData.orderId}\n金额：¥${orderData.total.toFixed(2)}\n\n（演示模式：不会真正扣款）`);
+      return games[gameId];
     }
 
-    // 显示通知
-    function showNotification(message) {
-      const notification = document.createElement('div');
-      notification.textContent = message;
-      notification.style.cssText = `
-        position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
-        background-color: var(--success-color); color: white;
-        padding: 12px 24px; border-radius: 30px; z-index: 2000;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2); animation: slideIn 0.3s ease-out;
-      `;
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes slideIn { from { top: 80px; opacity: 0; } to { top: 100px; opacity: 1; } }
-        @keyframes slideOut { from { top: 100px; opacity: 1; } to { top: 80px; opacity: 0; } }
-      `;
-      document.head.appendChild(style);
-      document.body.appendChild(notification);
-      setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease-out forwards';
-        setTimeout(() => { if (notification.parentNode) notification.remove(); }, 300);
-      }, 2000);
+    function getSamplePackages(gameId) {
+      return [
+        { id: 1, name: "60 结晶", price: 6, original_price: 6, recommend: false },
+        { id: 2, name: "300 结晶", price: 30, original_price: 30, recommend: false },
+        { id: 3, name: "980 结晶", price: 98, original_price: 98, recommend: true },
+        { id: 4, name: "1980 结晶", price: 198, original_price: 198, recommend: true },
+        { id: 5, name: "3280 结晶", price: 328, original_price: 328, recommend: true },
+        { id: 6, name: "6480 结晶", price: 648, original_price: 864, badge: "25% OFF", recommend: true }
+      ];
     }
 
-    // 绑定按钮事件（添加空值检查）
-    if (mobileCartBtn) mobileCartBtn.addEventListener('click', addToCart);
-    if (mobileBuyBtn) mobileBuyBtn.addEventListener('click', buyNow);
-    if (desktopCartBtn) desktopCartBtn.addEventListener('click', addToCart);
-    if (desktopBuyBtn) desktopBuyBtn.addEventListener('click', buyNow);
+    function getSampleReviews(gameId) {
+      return [
+        { name: "玩家 A", date: "2026-02-20", rating: 5, content: "充值秒到账，服务很稳定！" },
+        { name: "玩家 B", date: "2026-02-19", rating: 5, content: "比官方便宜，推荐！" },
+        { name: "玩家 C", date: "2026-02-18", rating: 4, content: "第一次用，体验不错" }
+      ];
+    }
 
-    // 页面加载完成后初始化
-    document.addEventListener('DOMContentLoaded', initPage);
-
-    // 🎉 调试信息
-    console.log('🎮 欢迎来到原神充值页面！');
-    console.log('🔧 如果功能不工作，请检查控制台错误信息');
-    console.log('📱 建议使用 Acode 本地服务器运行，而不是直接打开 file://');
+    document.addEventListener('DOMContentLoaded', () => {
+      loadGameDetail();
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      
+      document.querySelectorAll('.payment-method').forEach(method => {
+        method.addEventListener('click', () => {
+          document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+          method.classList.add('selected');
+          paymentMethod = method.dataset.method;
+        });
+      });
+    });
   </script>
 </body>
 </html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>注册账号 - GameTopUp</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="translations.js"></script>
+  <script src="i18n.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #6C63FF;
+      --secondary: #FF6584;
+      --success: #28A745;
+      --light: #F8F9FA;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .register-box {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+    .register-title {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+    .register-subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .form-hint {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 5px;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      width: 100%;
+    }
+    .btn-primary:hover {
+      background: #5a52d5;
+      transform: translateY(-2px);
+    }
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+    }
+    .login-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .login-link a:hover { text-decoration: underline; }
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .success-message {
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-box">
+    <h1 class="register-title">🎮 注册 GameTopUp</h1>
+    <p class="register-subtitle">创建账号，享受专属优惠</p>
+    
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+    
+    <form onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label class="form-label">邮箱</label>
+        <input type="email" class="form-input" id="email" required placeholder="your@email.com">
+        <div class="form-hint">我们将发送验证邮件到这个邮箱</div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">密码</label>
+        <input type="password" class="form-input" id="password" required placeholder="至少 6 位密码" minlength="6">
+        <div class="form-hint">密码至少 6 位，建议包含字母和数字</div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">确认密码</label>
+        <input type="password" class="form-input" id="confirmPassword" required placeholder="再次输入密码">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">用户名（可选）</label>
+        <input type="text" class="form-input" id="username" placeholder="显示在个人中心的名字">
+      </div>
+      
+      <button type="submit" class="btn btn-primary" id="submitBtn">
+        <i class="fas fa-user-plus"></i> 立即注册
+      </button>
+    </form>
+    
+    <div class="login-link">
+      已有账号？<a href="profile.html">立即登录</a>
+    </div>
+  </div>
+
+  <script>
+    async function handleRegister(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const username = document.getElementById('username').value;
+      
+      const errorEl = document.getElementById('errorMessage');
+      const successEl = document.getElementById('successMessage');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      // 验证密码
+      if (password !== confirmPassword) {
+        errorEl.textContent = '❌ 两次输入的密码不一致';
+        errorEl.style.display = 'block';
+        successEl.style.display = 'none';
+        return;
+      }
+      
+      if (password.length < 6) {
+        errorEl.textContent = '❌ 密码至少 6 位';
+        errorEl.style.display = 'block';
+        successEl.style.display = 'none';
+        return;
+      }
+      
+      // 禁用按钮
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 注册中...';
+      
+      try {
+        // 通过 Supabase 注册
+        const { data, error } = await db.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { username: username || email.split('@')[0] }
+          }
+        });
+        
+        if (error) throw error;
+        
+        // 注册成功
+        successEl.textContent = '✅ 注册成功！请检查邮箱验证（或直接登录）';
+        successEl.style.display = 'block';
+        errorEl.style.display = 'none';
+        
+        // 3 秒后跳转到登录页
+        setTimeout(() => {
+          window.location.href = 'profile.html';
+        }, 3000);
+        
+      } catch (err) {
+        errorEl.textContent = '❌ 注册失败：' + err.message;
+        errorEl.style.display = 'block';
+        successEl.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> 立即注册';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -3,40 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>我的 - GameTopUp</title>
+  <meta name="theme-color" content="#6C63FF">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title data-i18n="seo.profile.title">个人中心 - GameTopUp</title>
+  <meta name="description" data-i18n="seo.profile.desc" content="管理你的账户信息和设置">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- 统一配置文件 -->
+  <script src="config.js"></script>
+  
+  <!-- 多语言支持 -->
+  <script src="translations.js"></script>
+  <script src="i18n.js"></script>
+  
+  <!-- SEO 加载器 -->
+  <script src="seo-loader.js"></script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --primary-color: #6C63FF;
       --secondary-color: #FF6584;
+      --accent-color: #36D1DC;
+      --dark-color: #1A1A2E;
       --light-color: #F8F9FA;
+      --success-color: #28A745;
       --text-dark: #333;
       --text-light: #666;
       --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 20px rgba(0,0,0,0.1);
+      --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
+      --bg-color: #F8F9FA;
+      --card-bg: #FFFFFF;
+    }
+    [data-theme="dark"] {
+      --bg-color: #1A1A2E;
+      --card-bg: #16213E;
+      --text-dark: #E8E8E8;
+      --text-light: #A0A0A0;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+      --shadow-lg: 0 10px 20px rgba(0,0,0,0.3);
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: var(--light-color);
+      background-color: var(--bg-color);
       color: var(--text-dark);
+      line-height: 1.6;
       padding-bottom: 70px;
+      transition: background-color 0.3s, color 0.3s;
     }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
-
-    /* 头部 */
     .header {
-      background: white;
+      background: var(--card-bg);
       padding: 15px 0;
       position: sticky;
       top: 0;
       z-index: 1000;
       box-shadow: var(--shadow-sm);
+      transition: background-color 0.3s;
     }
-    .header-title { font-size: 1.2rem; font-weight: 700; text-align: center; }
-
-    /* 用户信息卡片 */
+    .header-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-align: center;
+    }
     .user-card {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       border-radius: var(--radius-lg);
@@ -45,21 +91,32 @@
       color: white;
       text-align: center;
       box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+      transition: background 0.3s;
     }
     .user-avatar {
-      width: 80px; height: 80px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       background: white;
       color: var(--primary-color);
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 2rem;
       margin: 0 auto 15px;
       font-weight: 700;
     }
-    .user-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
-    .user-id { font-size: 0.9rem; opacity: 0.9; }
+    .user-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .user-id {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-bottom: 15px;
+    }
     .login-btn {
-      margin-top: 15px;
       padding: 8px 30px;
       background: white;
       color: var(--primary-color);
@@ -67,16 +124,20 @@
       border-radius: 20px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s;
     }
-
-    /* 登录表单 */
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
     .login-form {
-      background: white;
+      background: var(--card-bg);
       border-radius: var(--radius-lg);
       padding: 20px;
       margin: 20px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow-md);
       display: none;
+      transition: background-color 0.3s;
     }
     .login-form.show { display: block; }
     .input-group { margin-bottom: 15px; }
@@ -86,6 +147,13 @@
       border: 1px solid #ddd;
       border-radius: var(--radius-md);
       font-size: 1rem;
+      background: var(--card-bg);
+      color: var(--text-dark);
+      transition: border-color 0.3s;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: var(--primary-color);
     }
     .submit-btn {
       width: 100%;
@@ -96,22 +164,88 @@
       border-radius: var(--radius-md);
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s;
     }
-
-    /* 菜单列表 */
+    .submit-btn:hover {
+      background: #5a52d5;
+      transform: translateY(-2px);
+    }
+    .forgot-link {
+      text-align: center;
+      margin-top: 15px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    .forgot-link a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    .register-link {
+      text-align: center;
+      margin-top: 10px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    .register-link a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 20px 15px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      font-size: 1.3rem;
+    }
+    .stat-icon.orders { background: #e3f2fd; color: #1976d2; }
+    .stat-icon.spent { background: #fff3e0; color: #f57c00; }
+    .stat-icon.saved { background: #e8f5e9; color: #388e3c; }
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
     .menu-list {
-      background: white;
+      background: var(--card-bg);
       border-radius: var(--radius-lg);
       margin: 20px;
       overflow: hidden;
       box-shadow: var(--shadow-sm);
+      transition: background-color 0.3s;
     }
     .menu-item {
       padding: 15px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid #eee;
       cursor: pointer;
       transition: background 0.3s;
     }
@@ -119,29 +253,34 @@
     .menu-item:hover { background: #f8f9fa; }
     .menu-left { display: flex; align-items: center; gap: 15px; }
     .menu-icon {
-      width: 35px; height: 35px;
+      width: 35px;
+      height: 35px;
       border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 1.1rem;
     }
     .menu-icon.orders { background: #e3f2fd; color: #1976d2; }
     .menu-icon.support { background: #fff3e0; color: #f57c00; }
     .menu-icon.settings { background: #f3e5f5; color: #7b1fa2; }
-    .menu-text { font-weight: 500; }
+    .menu-text {
+      font-weight: 500;
+      color: var(--text-dark);
+    }
     .menu-arrow { color: var(--text-light); }
-
-    /* 底部导航 */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: white;
+      background: var(--card-bg);
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
       z-index: 1000;
+      transition: background-color 0.3s;
     }
     .nav-item {
       display: flex;
@@ -152,36 +291,83 @@
       color: var(--text-light);
       cursor: pointer;
       padding: 5px 15px;
+      transition: color 0.3s;
     }
     .nav-item.active { color: var(--primary-color); }
     .nav-item i { font-size: 1.2rem; }
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card-bg);
+      padding: 15px 30px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 2000;
+      display: none;
+      animation: slideDown 0.3s ease-out;
+    }
+    .toast.show { display: block; }
+    .toast.success { background: #e8f5e9; color: #2e7d32; }
+    .toast.error { background: #ffebee; color: #c62828; }
+    @keyframes slideDown {
+      from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
+  <!-- 头部 -->
   <header class="header">
     <div class="container">
-      <div class="header-title">个人中心</div>
+      <div class="header-title" data-i18n="profile.title">个人中心</div>
     </div>
   </header>
 
-  <!-- 用户信息 -->
+  <!-- 用户信息卡片 -->
   <div class="user-card" id="userCard">
     <div class="user-avatar" id="userAvatar">👤</div>
-    <div class="user-name" id="userName">未登录</div>
-    <div class="user-id" id="userId">登录后享受专属服务</div>
-    <button class="login-btn" id="loginBtn" onclick="showLogin()">立即登录</button>
-    <button class="login-btn" id="logoutBtn" onclick="logout()" style="display: none; background: #ffebee; color: #c62828;">退出登录</button>
+    <div class="user-name" id="userName" data-i18n="profile.notLoggedIn">未登录</div>
+    <div class="user-id" id="userId" data-i18n="profile.loggedIn.desc">登录后享受专属服务</div>
+    <button class="login-btn" id="loginBtn" onclick="showLogin()" data-i18n="profile.login.btn">立即登录</button>
+    <button class="login-btn" id="logoutBtn" onclick="logout()" style="display: none; background: #ffebee; color: #c62828;" data-i18n="profile.logout.btn">退出登录</button>
   </div>
 
   <!-- 登录表单 -->
   <div class="login-form" id="loginForm">
     <div class="input-group">
-      <input type="text" class="input-field" id="loginUsername" placeholder="请输入用户名">
+      <input type="email" class="input-field" id="loginEmail" data-i18n="profile.login.email" placeholder="请输入邮箱">
     </div>
     <div class="input-group">
-      <input type="password" class="input-field" id="loginPassword" placeholder="请输入密码（任意）">
+      <input type="password" class="input-field" id="loginPassword" data-i18n="profile.login.password" placeholder="请输入密码">
     </div>
-    <button class="submit-btn" onclick="submitLogin()">登录</button>
+    <button class="submit-btn" onclick="submitLogin()" data-i18n="common.login">登录</button>
+    <div class="forgot-link">
+      <a href="#" onclick="showComingSoon()" data-i18n="profile.login.forgot">忘记密码？</a>
+    </div>
+    <div class="register-link">
+      还没有账号？<a href="register.html" data-i18n="profile.register.link">立即注册</a>
+    </div>
+  </div>
+
+  <!-- 数据统计 -->
+  <div class="stats-grid" id="statsGrid" style="display: none;">
+    <div class="stat-card">
+      <div class="stat-icon orders"><i class="fas fa-receipt"></i></div>
+      <div class="stat-value" id="statOrders">0</div>
+      <div class="stat-label" data-i18n="profile.stats.orders">总订单</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon spent"><i class="fas fa-coins"></i></div>
+      <div class="stat-value" id="statSpent">¥0</div>
+      <div class="stat-label" data-i18n="profile.stats.spent">累计充值</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon saved"><i class="fas fa-piggy-bank"></i></div>
+      <div class="stat-value" id="statSaved">¥0</div>
+      <div class="stat-label" data-i18n="profile.stats.saved">节省金额</div>
+    </div>
   </div>
 
   <!-- 功能菜单 -->
@@ -189,21 +375,21 @@
     <div class="menu-item" onclick="window.location.href='orders.html'">
       <div class="menu-left">
         <div class="menu-icon orders"><i class="fas fa-receipt"></i></div>
-        <div class="menu-text">我的订单</div>
+        <div class="menu-text" data-i18n="profile.menu.orders">我的订单</div>
       </div>
       <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
     </div>
-    <div class="menu-item">
+    <div class="menu-item" onclick="window.location.href='chat.html'">
       <div class="menu-left">
         <div class="menu-icon support"><i class="fas fa-headset"></i></div>
-        <div class="menu-text">客服支持</div>
+        <div class="menu-text" data-i18n="profile.menu.support">客服支持</div>
       </div>
       <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
     </div>
-    <div class="menu-item">
+    <div class="menu-item" onclick="window.location.href='settings.html'">
       <div class="menu-left">
         <div class="menu-icon settings"><i class="fas fa-cog"></i></div>
-        <div class="menu-text">设置</div>
+        <div class="menu-text" data-i18n="profile.menu.settings">设置</div>
       </div>
       <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
     </div>
@@ -213,79 +399,188 @@
   <nav class="bottom-nav">
     <div class="nav-item" onclick="window.location.href='index.html'">
       <i class="fas fa-home"></i>
-      <span>首页</span>
+      <span data-i18n="nav.home">首页</span>
     </div>
     <div class="nav-item" onclick="window.location.href='cart.html'">
       <i class="fas fa-shopping-cart"></i>
-      <span>购物车</span>
+      <span data-i18n="common.cart">购物车</span>
+    </div>
+    <div class="nav-item" onclick="window.location.href='orders.html'">
+      <i class="fas fa-file-alt"></i>
+      <span data-i18n="common.orders">订单</span>
     </div>
     <div class="nav-item active">
       <i class="fas fa-user"></i>
-      <span>我的</span>
+      <span data-i18n="common.profile">我的</span>
     </div>
   </nav>
 
-  <script>
-    // 初始化
-    function initPage() {
-      checkLoginStatus();
-    }
+  <!-- 消息提示 -->
+  <div class="toast" id="toast"></div>
 
-    // 检查登录状态
-    function checkLoginStatus() {
-      const user = localStorage.getItem('gameTopUpUser');
-      if (user) {
-        const userInfo = JSON.parse(user);
-        document.getElementById('userName').textContent = userInfo.username;
-        document.getElementById('userId').textContent = 'ID: ' + userInfo.id;
-        document.getElementById('userAvatar').textContent = userInfo.username.charAt(0).toUpperCase();
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'inline-block';
-        document.getElementById('loginForm').classList.remove('show');
-      } else {
-        document.getElementById('userName').textContent = '未登录';
-        document.getElementById('userId').textContent = '登录后享受专属服务';
-        document.getElementById('userAvatar').textContent = '👤';
-        document.getElementById('loginBtn').style.display = 'inline-block';
-        document.getElementById('logoutBtn').style.display = 'none';
+  <script>
+    let currentUser = null;
+
+    // 初始化页面
+    async function initPage() {
+      // 🔐 关键：确保使用正确的用户 session
+      const { data: { session }, error: sessionError } = await db.auth.getSession();
+      
+      if (sessionError) {
+        console.error('获取 session 失败:', sessionError);
+        return;
+      }
+      
+      if (session && session.user) {
+        currentUser = session.user;
+        console.log('✅ 当前用户:', currentUser.id);
+        updateUserInfo();
+        await loadStats();  // 🔐 加载统计前确保用户已认证
+      }
+      
+      // 深色模式
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      
+      // 多语言
+      if (typeof applyLanguage === 'function') {
+        applyLanguage();
       }
     }
 
     // 显示登录表单
     window.showLogin = function() {
       document.getElementById('loginForm').classList.add('show');
-    }
+      document.getElementById('loginBtn').style.display = 'none';
+    };
 
     // 提交登录
-    window.submitLogin = function() {
-      const username = document.getElementById('loginUsername').value.trim();
-      if (!username) {
-        alert('⚠️ 请输入用户名');
+    window.submitLogin = async function() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        showToast('⚠️ 请输入邮箱和密码', 'error');
         return;
       }
-      const userInfo = {
-        username: username,
-        id: 'U' + Date.now().toString().slice(-6),
-        loginTime: new Date().toISOString()
-      };
-      localStorage.setItem('gameTopUpUser', JSON.stringify(userInfo));
+
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        showToast(t('notify.login.failed') + ': ' + error.message, 'error');
+        return;
+      }
+
+      currentUser = data.user;
       document.getElementById('loginForm').classList.remove('show');
-      document.getElementById('loginUsername').value = '';
-      document.getElementById('loginPassword').value = '';
-      checkLoginStatus();
-      alert('✅ 登录成功！');
-    }
+      updateUserInfo();
+      await loadStats();
+      showToast(t('notify.login.success'), 'success');
+    };
 
     // 退出登录
-    window.logout = function() {
+    window.logout = async function() {
       if (confirm('确定要退出登录吗？')) {
-        localStorage.removeItem('gameTopUpUser');
-        checkLoginStatus();
-        alert('👋 已退出登录');
+        await db.auth.signOut();
+        currentUser = null;
+        location.reload();
+      }
+    };
+
+    // 更新用户信息
+    function updateUserInfo() {
+      if (!currentUser) return;
+
+      const email = currentUser.email;
+      const username = currentUser.user_metadata?.username || email.split('@')[0];
+      
+      document.getElementById('userName').textContent = username;
+      document.getElementById('userId').textContent = email;
+      document.getElementById('userAvatar').textContent = username.charAt(0).toUpperCase();
+      document.getElementById('loginBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'inline-block';
+      document.getElementById('statsGrid').style.display = 'grid';
+      document.getElementById('loginForm').classList.remove('show');
+    }
+
+    // 🔐 修复版：加载统计数据（确保只加载当前用户的订单）
+    async function loadStats() {
+      // 🔐 关键：必须先确认用户已登录
+      if (!currentUser || !currentUser.id) {
+        console.warn('⚠️ 用户未登录，跳过加载统计');
+        return;
+      }
+
+      try {
+        // 🔐 关键：使用 eq('user_id', currentUser.id) 严格过滤
+        // 🔐 并且只查询需要的字段，避免权限问题
+        const { data, error } = await db
+          .from('orders')
+          .select('total, status, discount')
+          .eq('user_id', currentUser.id)  // 🔴 必须过滤当前用户
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('加载订单统计失败:', error);
+          // 如果是权限错误，可能是 RLS 未配置
+          if (error.code === '42501') {
+            console.warn('⚠️ 可能是 Row Level Security 未配置，请联系管理员');
+          }
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          // 没有订单，显示 0
+          document.getElementById('statOrders').textContent = '0';
+          document.getElementById('statSpent').textContent = `${SITE_CONFIG?.currency || '¥'}0.00`;
+          document.getElementById('statSaved').textContent = `${SITE_CONFIG?.currency || '¥'}0.00`;
+          return;
+        }
+
+        // 🔐 再次在客户端过滤（双重保险）
+        const userOrders = data.filter(order => order.user_id === currentUser.id);
+        const completedOrders = userOrders.filter(o => o.status === 'completed');
+        
+        const totalOrders = completedOrders.length;
+        const totalSpent = completedOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+        const totalSaved = userOrders.reduce((sum, o) => sum + (o.discount || 0), 0);
+
+        document.getElementById('statOrders').textContent = totalOrders;
+        document.getElementById('statSpent').textContent = `${SITE_CONFIG?.currency || '¥'}${totalSpent.toFixed(2)}`;
+        document.getElementById('statSaved').textContent = `${SITE_CONFIG?.currency || '¥'}${totalSaved.toFixed(2)}`;
+
+        console.log(`✅ 加载统计成功：${totalOrders} 个订单，总计 ¥${totalSpent.toFixed(2)}`);
+
+      } catch (err) {
+        console.error('加载统计异常:', err);
+        // 静默失败，不影响页面使用
       }
     }
 
+    // 显示消息提示
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    window.showComingSoon = function() {
+      showToast('🚧 功能开发中，敬请期待！', 'error');
+    };
+
+    // 页面加载完成后执行
     document.addEventListener('DOMContentLoaded', initPage);
+
+    // 监听语言切换事件
+    window.addEventListener('languageChanged', () => {
+      if (typeof applyLanguage === 'function') {
+        applyLanguage();
+      }
+    });
   </script>
 </body>
 </html>

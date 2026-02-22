@@ -2,516 +2,321 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>支付确认 - GameTopUp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="seo.payment.title">支付确认 - GameTopUp</title>
+  <meta name="description" data-i18n="seo.payment.desc" content="安全支付，支持多种支付方式">
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="translations.js"></script>
+  <script src="i18n.js"></script>
+  <script src="seo-loader.js"></script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --primary-color: #6C63FF;
       --secondary-color: #FF6584;
       --success-color: #28A745;
-      --light-color: #F8F9FA;
+      --bg-color: #F8F9FA;
+      --card-bg: #FFFFFF;
       --text-dark: #333;
       --text-light: #666;
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-      --radius-md: 12px;
-      --radius-lg: 16px;
     }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: var(--light-color);
-      color: var(--text-dark);
-      padding-bottom: 80px;
+    [data-theme="dark"] {
+      --bg-color: #1A1A2E;
+      --card-bg: #16213E;
+      --text-dark: #E8E8E8;
+      --text-light: #A0A0A0;
     }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 80px; }
     .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
-
-    /* 头部 */
-    .header {
-      background: white;
-      padding: 15px 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: var(--shadow-sm);
-    }
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .back-btn {
-      background: none; border: none; font-size: 1rem;
-      color: var(--text-dark); cursor: pointer;
-    }
+    .header { background: var(--card-bg); padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-content { display: flex; align-items: center; justify-content: space-between; }
+    .back-btn { background: none; border: none; font-size: 1rem; color: var(--text-dark); cursor: pointer; }
     .page-title { font-size: 1.2rem; font-weight: 700; }
-
-    /* 订单信息 */
-    .order-section {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      margin: 20px;
-      box-shadow: var(--shadow-sm);
-    }
-    .section-title {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
-    }
-    .order-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
+    .order-section { background: var(--card-bg); border-radius: 16px; padding: 20px; margin: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .section-title { font-size: 1rem; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+    .order-item { display: flex; justify-content: space-between; margin-bottom: 12px; }
     .order-label { color: var(--text-light); }
     .order-value { font-weight: 600; }
-    .order-total {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 2px dashed #eee;
-      display: flex;
-      justify-content: space-between;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--primary-color);
-    }
-
-    /* 支付方式 */
-    .payment-methods {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .payment-option {
-      background: white;
-      border: 2px solid #eee;
-      border-radius: var(--radius-md);
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
+    .order-total { margin-top: 15px; padding-top: 15px; border-top: 2px dashed #eee; display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; color: var(--primary-color); }
+    .payment-methods { display: flex; flex-direction: column; gap: 12px; }
+    .payment-option { background: var(--card-bg); border: 2px solid #eee; border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.3s; }
     .payment-option:hover { border-color: var(--primary-color); }
-    .payment-option.selected {
-      border-color: var(--primary-color);
-      background-color: rgba(108, 99, 255, 0.05);
-    }
-    .payment-icon {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem;
-    }
+    .payment-option.selected { border-color: var(--primary-color); background-color: rgba(108, 99, 255, 0.05); }
+    .payment-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
     .payment-icon.alipay { background: #1677FF; color: white; }
     .payment-icon.wechat { background: #07C160; color: white; }
     .payment-icon.paypal { background: #003087; color: white; }
     .payment-info { flex: 1; }
     .payment-name { font-weight: 600; margin-bottom: 3px; }
     .payment-desc { font-size: 0.8rem; color: var(--text-light); }
-    .payment-check {
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      border: 2px solid #ddd;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .payment-option.selected .payment-check {
-      background: var(--primary-color);
-      border-color: var(--primary-color);
-      color: white;
-    }
-
-    /* 账号输入 */
-    .account-section {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      margin: 20px;
-      box-shadow: var(--shadow-sm);
-    }
+    .payment-check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; }
+    .payment-option.selected .payment-check { background: var(--primary-color); border-color: var(--primary-color); color: white; }
+    .account-section { background: var(--card-bg); border-radius: 16px; padding: 20px; margin: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .input-group { margin-bottom: 15px; }
-    .input-label {
-      display: block;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: var(--text-dark);
-    }
-    .input-field {
-      width: 100%;
-      padding: 12px 15px;
-      border: 1px solid #ddd;
-      border-radius: var(--radius-md);
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.3s;
-    }
+    .input-label { display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-dark); }
+    .input-field { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; outline: none; background: var(--card-bg); color: var(--text-dark); }
     .input-field:focus { border-color: var(--primary-color); }
-    .input-hint {
-      font-size: 0.8rem;
-      color: var(--text-light);
-      margin-top: 5px;
-    }
-
-    /* 安全提示 */
-    .security-notice {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      border-radius: var(--radius-md);
-      padding: 12px 15px;
-      margin: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.9rem;
-      color: #856404;
-    }
-
-    /* 底部支付按钮 */
-    .pay-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      padding: 15px 20px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-      z-index: 1000;
-    }
-    .pay-btn {
-      width: 100%;
-      padding: 15px;
-      background: linear-gradient(135deg, var(--primary-color), #36D1DC);
-      color: white;
-      border: none;
-      border-radius: var(--radius-lg);
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
-      transition: all 0.3s;
-    }
-    .pay-btn:hover { transform: translateY(-2px); }
-    .pay-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    /* 支付成功动画 */
-    .success-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    .success-overlay.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .success-content {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: 40px;
-      text-align: center;
-      max-width: 90%;
-      animation: popIn 0.4s ease-out;
-    }
-    @keyframes popIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .success-icon {
-      width: 80px; height: 80px;
-      background: var(--success-color);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 2.5rem;
-      color: white;
-    }
-    .success-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    .success-order {
-      color: var(--text-light);
-      margin-bottom: 20px;
-    }
-    .success-btn {
-      padding: 12px 40px;
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 25px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    /* 加载中 */
-    .loading-spinner {
-      width: 40px; height: 40px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid var(--primary-color);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    .input-hint { font-size: 0.8rem; color: var(--text-light); margin-top: 5px; }
+    .coupon-section { background: var(--card-bg); border-radius: 16px; padding: 20px; margin: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .coupon-input-group { display: flex; gap: 10px; margin-top: 10px; }
+    .coupon-input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; background: var(--card-bg); color: var(--text-dark); }
+    .coupon-btn { padding: 12px 20px; background: var(--secondary-color); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
+    .coupon-result { margin-top: 10px; padding: 10px; border-radius: 12px; font-size: 0.9rem; display: none; }
+    .coupon-result.success { background: #e8f5e9; color: #2e7d32; display: block; }
+    .coupon-result.error { background: #ffebee; color: #c62828; display: block; }
+    .pay-footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+    .pay-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+    .pay-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .success-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .success-overlay.show { opacity: 1; pointer-events: auto; }
+    .success-content { background: var(--card-bg); border-radius: 16px; padding: 40px; text-align: center; max-width: 90%; }
+    .success-icon { width: 80px; height: 80px; background: var(--success-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.5rem; color: white; }
+    .success-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; }
   </style>
 </head>
 <body>
-  <!-- 头部 -->
   <header class="header">
     <div class="container header-content">
-      <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i></button>
-      <div class="page-title">确认支付</div>
-      <div style="width: 40px;"></div>
+      <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+      <div class="page-title" data-i18n="payment.title">确认支付</div>
+      <div style="width: 36px;"></div>
     </div>
   </header>
 
-  <!-- 订单信息 -->
   <div class="container">
     <div class="order-section">
-      <div class="section-title">📦 订单信息</div>
+      <div class="section-title" data-i18n="payment.order.title">📦 订单信息</div>
       <div class="order-item">
-        <span class="order-label">订单编号</span>
+        <span class="order-label" data-i18n="payment.order.id">订单编号</span>
         <span class="order-value" id="orderId">-</span>
       </div>
       <div class="order-item">
-        <span class="order-label">商品名称</span>
+        <span class="order-label" data-i18n="payment.order.item">商品名称</span>
         <span class="order-value" id="itemName">-</span>
       </div>
       <div class="order-item">
-        <span class="order-label">套餐内容</span>
+        <span class="order-label" data-i18n="payment.order.package">套餐内容</span>
         <span class="order-value" id="packageInfo">-</span>
       </div>
       <div class="order-item">
-        <span class="order-label">购买数量</span>
+        <span class="order-label" data-i18n="payment.order.quantity">购买数量</span>
         <span class="order-value" id="quantity">-</span>
       </div>
+      <div class="order-item">
+        <span class="order-label" data-i18n="payment.order.original">原价</span>
+        <span class="order-value" id="originalAmount">¥0.00</span>
+      </div>
+      <div class="order-item" id="discountRow" style="display: none;">
+        <span class="order-label" data-i18n="payment.order.discount">优惠折扣</span>
+        <span class="order-value" style="color: var(--success-color);" id="discountAmount">-¥0.00</span>
+      </div>
       <div class="order-total">
-        <span>应付总额</span>
+        <span data-i18n="payment.total">应付总额</span>
         <span id="totalAmount">¥0.00</span>
       </div>
     </div>
 
-    <!-- 支付方式 -->
+    <div class="coupon-section">
+      <div class="section-title" data-i18n="payment.coupon.title">🎫 优惠券</div>
+      <div class="coupon-input-group">
+        <input type="text" class="coupon-input" id="couponCode" data-i18n="payment.coupon.placeholder" placeholder="输入优惠码">
+        <button class="coupon-btn" onclick="applyCoupon()" data-i18n="payment.coupon.apply">使用</button>
+      </div>
+      <div class="coupon-result" id="couponResult"></div>
+      <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-light);" data-i18n="payment.coupon.hint">💡 可用优惠码：NEW2026 (9 折) | VIP50 (减¥50) | FIRST (减¥10)</div>
+    </div>
+
     <div class="order-section">
-      <div class="section-title">💳 选择支付方式</div>
+      <div class="section-title" data-i18n="payment.payment.title">💳 选择支付方式</div>
       <div class="payment-methods">
-        <div class="payment-option selected" data-method="alipay">
+        <div class="payment-option selected" data-method="alipay" onclick="selectPayment(this)">
           <div class="payment-icon alipay"><i class="fab fa-alipay"></i></div>
           <div class="payment-info">
-            <div class="payment-name">支付宝</div>
-            <div class="payment-desc">推荐使用，秒速到账</div>
+            <div class="payment-name" data-i18n="payment.payment.alipay">支付宝</div>
+            <div class="payment-desc" data-i18n="payment.payment.alipay.desc">推荐使用，秒速到账</div>
           </div>
           <div class="payment-check"><i class="fas fa-check"></i></div>
         </div>
-        <div class="payment-option" data-method="wechat">
+        <div class="payment-option" data-method="wechat" onclick="selectPayment(this)">
           <div class="payment-icon wechat"><i class="fab fa-weixin"></i></div>
           <div class="payment-info">
-            <div class="payment-name">微信支付</div>
-            <div class="payment-desc">方便快捷，安全可靠</div>
+            <div class="payment-name" data-i18n="payment.payment.wechat">微信支付</div>
+            <div class="payment-desc" data-i18n="payment.payment.wechat.desc">方便快捷，安全可靠</div>
           </div>
           <div class="payment-check"><i class="fas fa-check"></i></div>
         </div>
-        <div class="payment-option" data-method="paypal">
+        <div class="payment-option" data-method="paypal" onclick="selectPayment(this)">
           <div class="payment-icon paypal"><i class="fab fa-paypal"></i></div>
           <div class="payment-info">
-            <div class="payment-name">PayPal</div>
-            <div class="payment-desc">国际支付首选</div>
+            <div class="payment-name" data-i18n="payment.payment.paypal">PayPal</div>
+            <div class="payment-desc" data-i18n="payment.payment.paypal.desc">国际支付首选</div>
           </div>
           <div class="payment-check"><i class="fas fa-check"></i></div>
         </div>
       </div>
     </div>
 
-    <!-- 账号输入 -->
     <div class="account-section">
-      <div class="section-title">👤 充值账号</div>
+      <div class="section-title" data-i18n="payment.account.title">👤 充值账号</div>
       <div class="input-group">
-        <label class="input-label">游戏账号 / UID</label>
-        <input type="text" class="input-field" id="gameAccount" placeholder="请输入您的游戏账号">
-        <div class="input-hint">⚠️ 请仔细核对，充值后无法修改</div>
+        <label class="input-label" data-i18n="payment.account.label">游戏账号 / UID</label>
+        <input type="text" class="input-field" id="gameAccount" data-i18n="payment.account.placeholder" placeholder="请输入您的游戏账号">
+        <div class="input-hint" data-i18n="payment.account.hint">⚠️ 请仔细核对，充值后无法修改</div>
       </div>
       <div class="input-group">
-        <label class="input-label">确认账号</label>
+        <label class="input-label" data-i18n="payment.account.confirm">确认账号</label>
         <input type="text" class="input-field" id="confirmAccount" placeholder="再次输入游戏账号">
       </div>
     </div>
-
-    <!-- 安全提示 -->
-    <div class="security-notice">
-      <i class="fas fa-shield-alt"></i>
-      <div>
-        <strong>安全支付保障</strong><br>
-        您的支付信息已加密，本平台不会存储您的支付密码
-      </div>
-    </div>
   </div>
 
-  <!-- 底部支付按钮 -->
   <div class="pay-footer">
-    <button class="pay-btn" id="payBtn">立即支付</button>
+    <button class="pay-btn" id="payBtn" onclick="processPayment()" data-i18n="payment.btn">立即支付</button>
   </div>
 
-  <!-- 支付成功弹窗 -->
   <div class="success-overlay" id="successOverlay">
     <div class="success-content">
       <div class="success-icon"><i class="fas fa-check"></i></div>
-      <div class="success-title">支付成功！</div>
-      <div class="success-order" id="successOrder">订单号：ORD123456</div>
-      <div style="color: var(--success-color); margin-bottom: 20px;">
-        <i class="fas fa-clock"></i> 预计 1-5 分钟到账
-      </div>
-      <button class="success-btn" id="toOrdersBtn">查看订单</button>
+      <div class="success-title" data-i18n="payment.success.title">支付成功！</div>
+      <div style="color: var(--text-light); margin-bottom: 20px;" data-i18n="payment.success.desc">预计 1-5 分钟到账</div>
+      <button onclick="window.location.href='orders.html'" style="padding: 12px 40px; background: var(--primary-color); color: white; border: none; border-radius: 25px; cursor: pointer;" data-i18n="payment.success.btn">查看订单</button>
     </div>
   </div>
 
   <script>
-    // 🔧 安全获取 localStorage
-    function safeGetStorage(key, defaultValue) {
-      try {
-        const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : defaultValue;
-      } catch (e) { return defaultValue; }
-    }
-
-    function safeSetStorage(key, value) {
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-        return true;
-      } catch (e) { return false; }
-    }
-
-    // 订单数据
     let orderData = null;
     let selectedPayment = 'alipay';
+    let appliedCoupon = null;
+    let originalTotal = 0;
+    let discountAmount = 0;
 
-    // 初始化
-    function initPage() {
-      // 从 sessionStorage 获取待支付订单
-      orderData = sessionStorage.getItem('pendingOrder');
-      
-      if (!orderData) {
-        // 如果没有待支付订单，从购物车创建
-        const cart = safeGetStorage('gameTopUpCart', []);
-        if (cart.length === 0) {
-          alert('⚠️ 没有待支付的订单');
-          window.location.href = 'index.html';
-          return;
-        }
-        // 使用第一个商品作为订单
+    function loadOrder() {
+      let cart = sessionStorage.getItem('cartCheckout');
+      if (cart) {
+        cart = JSON.parse(cart);
         orderData = {
           items: cart,
           total: cart.reduce((sum, item) => sum + item.package.price * item.quantity, 0),
           orderId: 'ORD' + Date.now()
         };
       } else {
-        orderData = JSON.parse(orderData);
+        cart = sessionStorage.getItem('pendingOrder');
+        if (cart) orderData = JSON.parse(cart);
       }
 
-      // 填充订单信息
+      if (!orderData) { alert('⚠️ 没有待支付的订单'); window.location.href = 'index.html'; return; }
+
+      originalTotal = orderData.total;
       document.getElementById('orderId').textContent = orderData.orderId;
-      
-      // 商品名称（取第一个）
-      const firstItem = orderData.items[0];
-      document.getElementById('itemName').textContent = firstItem.game;
-      document.getElementById('packageInfo').textContent = firstItem.package.name;
-      document.getElementById('quantity').textContent = `×${firstItem.quantity}`;
-      document.getElementById('totalAmount').textContent = `¥${orderData.total.toFixed(2)}`;
-
-      // 支付方式选择
-      document.querySelectorAll('.payment-option').forEach(option => {
-        option.addEventListener('click', () => {
-          document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
-          option.classList.add('selected');
-          selectedPayment = option.dataset.method;
-        });
-      });
-
-      // 支付按钮
-      document.getElementById('payBtn').addEventListener('click', processPayment);
-
-      // 返回按钮
-      document.getElementById('backBtn').addEventListener('click', () => {
-        window.location.href = 'cart.html';
-      });
-
-      // 查看订单按钮
-      document.getElementById('toOrdersBtn').addEventListener('click', () => {
-        window.location.href = 'orders.html';
-      });
+      const firstItem = orderData.items ? orderData.items[0] : orderData;
+      document.getElementById('itemName').textContent = firstItem.gameName || firstItem.game || '游戏充值';
+      document.getElementById('packageInfo').textContent = firstItem.package?.name || '套餐';
+      document.getElementById('quantity').textContent = `×${firstItem.quantity || 1}`;
+      document.getElementById('originalAmount').textContent = `${SITE_CONFIG?.currency || '¥'}${originalTotal.toFixed(2)}`;
+      updateTotalDisplay();
     }
 
-    // 处理支付
-    function processPayment() {
+    window.selectPayment = function(element) {
+      document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedPayment = element.dataset.method;
+    };
+
+    window.applyCoupon = async function() {
+      const code = document.getElementById('couponCode').value.trim().toUpperCase();
+      const resultEl = document.getElementById('couponResult');
+
+      if (!code) { resultEl.className = 'coupon-result error'; resultEl.textContent = '⚠️ 请输入优惠码'; return; }
+
+      try {
+        const { data, error } = await db.from('coupons').select('*').eq('code', code).eq('active', true).single();
+        if (error || !data) { resultEl.className = 'coupon-result error'; resultEl.textContent = '❌ 优惠码无效或已过期'; appliedCoupon = null; discountAmount = 0; updateTotalDisplay(); return; }
+        if (originalTotal < data.min_order) { resultEl.className = 'coupon-result error'; resultEl.textContent = `⚠️ 订单满${SITE_CONFIG?.currency || '¥'}${data.min_order}才可使用`; appliedCoupon = null; discountAmount = 0; updateTotalDisplay(); return; }
+
+        if (data.type === 'percent') discountAmount = originalTotal * (1 - data.value);
+        else discountAmount = data.value;
+        if (discountAmount > originalTotal) discountAmount = originalTotal;
+
+        appliedCoupon = { code: data.code, ...data };
+        resultEl.className = 'coupon-result success';
+        resultEl.textContent = `✅ 优惠成功！${data.description}，节省${SITE_CONFIG?.currency || '¥'}${discountAmount.toFixed(2)}`;
+        updateTotalDisplay();
+      } catch (err) {
+        console.error('优惠券验证失败:', err);
+        resultEl.className = 'coupon-result error';
+        resultEl.textContent = '❌ 验证失败，请重试';
+      }
+    };
+
+    function updateTotalDisplay() {
+      const finalTotal = originalTotal - discountAmount;
+      document.getElementById('totalAmount').textContent = `${SITE_CONFIG?.currency || '¥'}${finalTotal.toFixed(2)}`;
+      if (discountAmount > 0) {
+        document.getElementById('discountRow').style.display = 'flex';
+        document.getElementById('discountAmount').textContent = `-${SITE_CONFIG?.currency || '¥'}${discountAmount.toFixed(2)}`;
+      } else {
+        document.getElementById('discountRow').style.display = 'none';
+      }
+    }
+
+    window.processPayment = async function() {
       const gameAccount = document.getElementById('gameAccount').value.trim();
       const confirmAccount = document.getElementById('confirmAccount').value.trim();
 
-      // 验证
-      if (!gameAccount) {
-        alert('⚠️ 请输入游戏账号');
-        return;
-      }
-      if (gameAccount !== confirmAccount) {
-        alert('⚠️ 两次输入的账号不一致，请重新输入');
-        return;
-      }
-      if (gameAccount.length < 5) {
-        alert('⚠️ 账号格式不正确，请检查后重试');
-        return;
-      }
+      if (!gameAccount) { alert('⚠️ 请输入游戏账号'); return; }
+      if (gameAccount !== confirmAccount) { alert('⚠️ 两次输入的账号不一致'); return; }
+      if (gameAccount.length < 5) { alert('⚠️ 账号格式不正确'); return; }
 
-      // 显示加载状态
       const payBtn = document.getElementById('payBtn');
       payBtn.disabled = true;
-      payBtn.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;border-width:2px;margin:0 auto;"></div> 处理中...';
+      payBtn.innerHTML = '<div style="width:20px;height:20px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;"></div> 处理中...';
 
-      // 模拟支付处理（2 秒延迟）
-      setTimeout(() => {
-        // 保存完整订单
-        orderData.gameAccount = gameAccount;
-        orderData.paymentMethod = selectedPayment;
-        orderData.status = 'completed';
-        orderData.payTime = new Date().toISOString();
+      try {
+        const finalTotal = originalTotal - discountAmount;
+        const firstItem = orderData.items ? orderData.items[0] : orderData;
 
-        let orders = safeGetStorage('gameTopUpOrders', []);
-        orders.unshift(orderData); // 添加到开头
-        safeSetStorage('gameTopUpOrders', orders);
+        const orderToSave = {
+          id: orderData.orderId,
+          user_id: null,
+          game_id: firstItem?.gameId || firstItem?.game || 'unknown',
+          package_id: firstItem?.package?.id || null,
+          quantity: firstItem?.quantity || 1,
+          total: finalTotal,
+          discount: discountAmount,
+          coupon_code: appliedCoupon?.code || null,
+          payment_method: selectedPayment,
+          game_account: gameAccount,
+          status: 'completed',
+          paid_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        };
 
-        // 清空购物车
-        safeSetStorage('gameTopUpCart', []);
+        const { data, error } = await db.from('orders').insert([orderToSave]).select();
+        if (error) throw error;
 
-        // 显示成功动画
+        localStorage.removeItem('gameTopUpCart');
+        sessionStorage.removeItem('cartCheckout');
+        sessionStorage.removeItem('pendingOrder');
+
         document.getElementById('successOrder').textContent = `订单号：${orderData.orderId}`;
         document.getElementById('successOverlay').classList.add('show');
-
-        // 恢复按钮
+      } catch (err) {
+        console.error('支付失败:', err);
+        alert('❌ 支付失败：' + err.message);
         payBtn.disabled = false;
         payBtn.textContent = '立即支付';
-      }, 2000);
-    }
+      }
+    };
 
-    // 页面加载
-    document.addEventListener('DOMContentLoaded', initPage);
+    document.addEventListener('DOMContentLoaded', () => {
+      loadOrder();
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    });
   </script>
 </body>
 </html>

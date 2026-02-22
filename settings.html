@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设置 - GameTopUp</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="translations.js"></script>
+  <script src="i18n.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #6C63FF;
+      --secondary: #FF6584;
+      --light: #F8F9FA;
+      --card-bg: #FFFFFF;
+      --text-dark: #333;
+      --text-light: #666;
+    }
+    [data-theme="dark"] {
+      --light: #1A1A2E;
+      --card-bg: #16213E;
+      --text-dark: #E8E8E8;
+      --text-light: #A0A0A0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--light);
+      color: var(--text-dark);
+      padding-bottom: 70px;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
+    .header {
+      background: var(--card-bg);
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      color: var(--text-dark);
+      cursor: pointer;
+    }
+    .header-title { font-size: 1.2rem; font-weight: 700; }
+    .settings-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      margin: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .section-title {
+      padding: 20px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-bottom: 1px solid #eee;
+    }
+    .setting-item {
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+    }
+    .setting-item:last-child { border-bottom: none; }
+    .setting-info { flex: 1; }
+    .setting-label { font-weight: 500; margin-bottom: 5px; }
+    .setting-desc { font-size: 0.85rem; color: var(--text-light); }
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s;
+      border-radius: 26px;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+    input:checked + .toggle-slider { background-color: var(--primary); }
+    input:checked + .toggle-slider:before { transform: translateX(24px); }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-danger { background: #DC3545; color: white; }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      cursor: pointer;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-item i { font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <button class="back-btn" onclick="window.location.href='profile.html'">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="header-title">设置</div>
+      <div style="width: 36px;"></div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- 账户设置 -->
+    <div class="settings-section">
+      <div class="section-title">👤 账户设置</div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">邮箱</div>
+          <div class="setting-desc" id="userEmail">加载中...</div>
+        </div>
+        <button class="btn" onclick="changeEmail()">修改</button>
+      </div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">密码</div>
+          <div class="setting-desc">••••••••</div>
+        </div>
+        <button class="btn" onclick="changePassword()">修改</button>
+      </div>
+    </div>
+
+    <!-- 偏好设置 -->
+    <div class="settings-section">
+      <div class="section-title">⚙️ 偏好设置</div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">深色模式</div>
+          <div class="setting-desc">夜间使用更舒适</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">通知</div>
+          <div class="setting-desc">接收订单状态通知</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="notificationToggle" checked onchange="toggleNotifications()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">语言</div>
+          <div class="setting-desc" id="currentLang">中文</div>
+        </div>
+        <select class="btn" onchange="changeLanguage(this.value)" style="background: white; border: 1px solid #ddd;">
+          <option value="zh-CN">中文</option>
+          <option value="en-US">English</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 隐私设置 -->
+    <div class="settings-section">
+      <div class="section-title">🔒 隐私设置</div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">清除缓存</div>
+          <div class="setting-desc">清除本地存储的购物车等数据</div>
+        </div>
+        <button class="btn" onclick="clearCache()">清除</button>
+      </div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">注销账号</div>
+          <div class="setting-desc">永久删除你的账号和数据</div>
+        </div>
+        <button class="btn btn-danger" onclick="deleteAccount()">注销</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="nav-item" onclick="window.location.href='index.html'">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="nav-item" onclick="window.location.href='cart.html'">
+      <i class="fas fa-shopping-cart"></i>
+      <span>购物车</span>
+    </div>
+    <div class="nav-item" onclick="window.location.href='orders.html'">
+      <i class="fas fa-file-alt"></i>
+      <span>订单</span>
+    </div>
+    <div class="nav-item active" onclick="window.location.href='profile.html'">
+      <i class="fas fa-user"></i>
+      <span>我的</span>
+    </div>
+  </nav>
+
+  <script>
+    // 加载用户信息
+    async function loadUserInfo() {
+      const { data: { session } } = await db.auth.getSession();
+      if (session && session.user) {
+        document.getElementById('userEmail').textContent = session.user.email;
+      }
+    }
+
+    // 深色模式
+    function toggleDarkMode() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+
+    // 通知设置
+    function toggleNotifications() {
+      const enabled = document.getElementById('notificationToggle').checked;
+      localStorage.setItem('notifications', enabled ? 'true' : 'false');
+      alert(enabled ? '✅ 通知已开启' : '❌ 通知已关闭');
+    }
+
+    // 语言设置
+    function changeLanguage(lang) {
+      localStorage.setItem('language', lang);
+      location.reload();
+    }
+
+    // 清除缓存
+    function clearCache() {
+      if (confirm('确定要清除本地缓存吗？（购物车数据将被清空）')) {
+        localStorage.removeItem('gameTopUpCart');
+        alert('✅ 缓存已清除');
+      }
+    }
+
+    // 修改邮箱
+    async function changeEmail() {
+      const newEmail = prompt('请输入新邮箱:');
+      if (!newEmail) return;
+      
+      try {
+        const { error } = await db.auth.updateUser({ email: newEmail });
+        if (error) throw error;
+        alert('✅ 邮箱修改成功，请检查新邮箱验证');
+        loadUserInfo();
+      } catch (err) {
+        alert('❌ 修改失败：' + err.message);
+      }
+    }
+
+    // 修改密码
+    async function changePassword() {
+      const newPassword = prompt('请输入新密码（至少 6 位）:');
+      if (!newPassword || newPassword.length < 6) {
+        alert('❌ 密码至少 6 位');
+        return;
+      }
+      
+      try {
+        const { error } = await db.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+        alert('✅ 密码修改成功');
+      } catch (err) {
+        alert('❌ 修改失败：' + err.message);
+      }
+    }
+
+    // 注销账号
+    async function deleteAccount() {
+      if (!confirm('⚠️ 确定要注销账号吗？此操作不可恢复！')) return;
+      if (!confirm('⚠️ 再次确认：所有数据将被永久删除！')) return;
+      
+      try {
+        const { error } = await db.auth.admin.deleteUser(await db.auth.getUser());
+        if (error) throw error;
+        alert('✅ 账号已注销');
+        window.location.href = 'index.html';
+      } catch (err) {
+        alert('❌ 注销失败：' + err.message);
+      }
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserInfo();
+      
+      // 加载当前设置
+      const darkMode = localStorage.getItem('theme') === 'dark';
+      document.getElementById('darkModeToggle').checked = darkMode;
+      
+      const notifications = localStorage.getItem('notifications') !== 'false';
+      document.getElementById('notificationToggle').checked = notifications;
+      
+      const lang = localStorage.getItem('language') || 'zh-CN';
+      document.getElementById('currentLang').textContent = lang === 'zh-CN' ? '中文' : 'English';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="chat.title">客服支持 - GameTopUp</title>
+  <meta name="description" content="联系在线客服，解决您的问题">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="translations.js"></script>
+  <script src="i18n.js"></script>
+  <script src="seo-loader.js"></script>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary-color: #6C63FF;
+      --secondary-color: #FF6584;
+      --bg-color: #F8F9FA;
+      --card-bg: #FFFFFF;
+      --text-dark: #333;
+      --text-light: #666;
+    }
+    [data-theme="dark"] {
+      --bg-color: #1A1A2E;
+      --card-bg: #16213E;
+      --text-dark: #E8E8E8;
+      --text-light: #A0A0A0;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 70px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+    .header { background: var(--card-bg); padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-content { display: flex; align-items: center; justify-content: space-between; }
+    .back-btn { background: none; border: none; font-size: 1rem; color: var(--text-dark); cursor: pointer; }
+    .header-title { font-size: 1.2rem; font-weight: 700; }
+    .online-section { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 16px; padding: 30px 20px; margin: 20px; color: white; text-align: center; }
+    .online-status { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; margin-bottom: 15px; }
+    .status-dot { width: 10px; height: 10px; background: #28A745; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .online-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
+    .online-desc { opacity: 0.9; margin-bottom: 20px; }
+    .contact-btn { padding: 12px 30px; background: white; color: var(--primary-color); border: none; border-radius: 25px; font-weight: 600; cursor: pointer; margin: 5px; }
+    .faq-section { background: var(--card-bg); border-radius: 16px; margin: 20px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .section-title { padding: 20px; font-size: 1.1rem; font-weight: 700; border-bottom: 1px solid #eee; }
+    .faq-item { border-bottom: 1px solid #eee; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-question { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.3s; }
+    .faq-question:hover { background: #f8f9fa; }
+    .faq-question-text { font-weight: 500; }
+    .faq-question-icon { transition: transform 0.3s; }
+    .faq-item.active .faq-question-icon { transform: rotate(180deg); }
+    .faq-answer { padding: 0 20px; max-height: 0; overflow: hidden; transition: all 0.3s; color: var(--text-light); line-height: 1.8; }
+    .faq-item.active .faq-answer { padding: 15px 20px; max-height: 500px; }
+    .contact-section { background: var(--card-bg); border-radius: 16px; margin: 20px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .contact-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #eee; }
+    .contact-item:last-child { border-bottom: none; }
+    .contact-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .contact-icon.qq { background: #12B7F5; color: white; }
+    .contact-icon.wechat { background: #07C160; color: white; }
+    .contact-icon.email { background: #EA4335; color: white; }
+    .contact-info { flex: 1; }
+    .contact-label { font-size: 0.8rem; color: var(--text-light); }
+    .contact-value { font-weight: 600; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.8rem; color: var(--text-light); cursor: pointer; }
+    .nav-item.active { color: var(--primary-color); }
+    .nav-item i { font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <button class="back-btn" onclick="window.location.href='profile.html'"><i class="fas fa-arrow-left"></i></button>
+      <div class="header-title" data-i18n="chat.title">客服支持</div>
+      <div style="width: 36px;"></div>
+    </div>
+  </header>
+
+  <div class="online-section">
+    <div class="online-status">
+      <div class="status-dot"></div>
+      <span data-i18n="chat.online.title">7×24 小时为您服务</span>
+    </div>
+    <div class="online-title" data-i18n="chat.online.desc">平均响应时间 < 1 分钟</div>
+    <button class="contact-btn" onclick="startChat()" data-i18n="chat.btn.chat"><i class="fas fa-comments"></i> 开始聊天</button>
+    <button class="contact-btn" onclick="copyContact()" data-i18n="chat.btn.copy"><i class="fas fa-copy"></i> 复制联系方式</button>
+  </div>
+
+  <div class="faq-section">
+    <div class="section-title" data-i18n="chat.faq.title">❓ 常见问题</div>
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <div class="faq-question-text" data-i18n="chat.faq.q1">充值多久到账？</div>
+        <div class="faq-question-icon"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-answer" data-i18n="chat.faq.a1">正常情况下，充值后 1-5 分钟内到账。如遇延迟，请联系客服查询订单状态。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <div class="faq-question-text" data-i18n="chat.faq.q2">充值失败怎么办？</div>
+        <div class="faq-question-icon"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-answer" data-i18n="chat.faq.a2">如充值失败，款项会在 24 小时内原路退回。您也可以联系客服重新下单或申请退款。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <div class="faq-question-text" data-i18n="chat.faq.q3">如何申请退款？</div>
+        <div class="faq-question-icon"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-answer" data-i18n="chat.faq.a3">未使用的充值订单可在 7 天内申请退款。请在订单页面点击"取消订单"或联系客服处理。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <div class="faq-question-text" data-i18n="chat.faq.q4">优惠券如何使用？</div>
+        <div class="faq-question-icon"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-answer" data-i18n="chat.faq.a4">在支付页面输入优惠码，点击"使用"即可。注意查看优惠券的使用条件和有效期。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <div class="faq-question-text" data-i18n="chat.faq.q5">账号安全吗？</div>
+        <div class="faq-question-icon"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-answer" data-i18n="chat.faq.a5">我们采用官方正规渠道充值，不会索要您的账号密码。只需提供游戏 UID/账号即可。</div>
+    </div>
+  </div>
+
+  <div class="contact-section">
+    <div class="section-title" data-i18n="chat.contact.title">📞 联系方式</div>
+    <div class="contact-item">
+      <div class="contact-icon qq"><i class="fab fa-qq"></i></div>
+      <div class="contact-info">
+        <div class="contact-label" data-i18n="chat.contact.qq">QQ 客服</div>
+        <div class="contact-value">123456789</div>
+      </div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-icon wechat"><i class="fab fa-weixin"></i></div>
+      <div class="contact-info">
+        <div class="contact-label" data-i18n="chat.contact.wechat">微信客服</div>
+        <div class="contact-value">GameTopUp_CS</div>
+      </div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-icon email"><i class="fas fa-envelope"></i></div>
+      <div class="contact-info">
+        <div class="contact-label" data-i18n="chat.contact.email">电子邮箱</div>
+        <div class="contact-value">support@gametopup.com</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="nav-item" onclick="window.location.href='index.html'">
+      <i class="fas fa-home"></i>
+      <span data-i18n="nav.home">首页</span>
+    </div>
+    <div class="nav-item" onclick="window.location.href='cart.html'">
+      <i class="fas fa-shopping-cart"></i>
+      <span data-i18n="common.cart">购物车</span>
+    </div>
+    <div class="nav-item" onclick="window.location.href='orders.html'">
+      <i class="fas fa-file-alt"></i>
+      <span data-i18n="common.orders">订单</span>
+    </div>
+    <div class="nav-item active">
+      <i class="fas fa-user"></i>
+      <span data-i18n="common.profile">我的</span>
+    </div>
+  </nav>
+
+  <script>
+    window.toggleFaq = function(element) {
+      const item = element.parentElement;
+      const wasActive = item.classList.contains('active');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+      if (!wasActive) item.classList.add('active');
+    };
+
+    window.startChat = function() {
+      alert('💬 客服聊天功能开发中！\n\n您可以先查看常见问题，或通过下方联系方式联系我们。');
+    };
+
+    window.copyContact = function() {
+      const text = 'QQ: 123456789\n微信：GameTopUp_CS\n邮箱：support@gametopup.com';
+      navigator.clipboard.writeText(text).then(() => {
+        alert('✅ 联系方式已复制到剪贴板！');
+      }).catch(() => {
+        alert('📋 联系方式：\n' + text);
+      });
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    });
+  </script>
+</body>
+</html>

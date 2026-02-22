@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活动中心 - GameTopUp</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="translations.js"></script>
+  <script src="i18n.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --primary: #6C63FF; --secondary: #FF6584; --light: #F8F9FA; --card-bg: #FFFFFF; --text-dark: #333; --text-light: #666; }
+    [data-theme="dark"] { --light: #1A1A2E; --card-bg: #16213E; --text-dark: #E8E8E8; --text-light: #A0A0A0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--light); color: var(--text-dark); padding-bottom: 70px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+    .header { background: var(--card-bg); padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-content { display: flex; align-items: center; justify-content: space-between; }
+    .back-btn { background: none; border: none; font-size: 1rem; color: var(--text-dark); cursor: pointer; }
+    .header-title { font-size: 1.2rem; font-weight: 700; }
+    .banner {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 16px;
+      padding: 30px;
+      margin: 20px;
+      color: white;
+      text-align: center;
+    }
+    .banner-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; }
+    .banner-desc { opacity: 0.9; margin-bottom: 20px; }
+    .banner-btn {
+      padding: 12px 30px;
+      background: white;
+      color: var(--primary);
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .events-list { padding: 20px; }
+    .event-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 20px;
+    }
+    .event-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+    .event-info { flex: 1; }
+    .event-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+    .event-time { font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px; }
+    .event-desc { color: var(--text-light); line-height: 1.6; margin-bottom: 15px; }
+    .event-tag {
+      display: inline-block;
+      background: var(--secondary);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      margin-right: 10px;
+    }
+    .event-tag.hot { background: #FF416C; }
+    .event-tag.new { background: #28A745; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.8rem; color: var(--text-light); cursor: pointer; }
+    .nav-item.active { color: var(--primary); }
+    .nav-item i { font-size: 1.2rem; }
+    .coming-soon { text-align: center; padding: 60px 20px; color: var(--text-light); }
+    .coming-soon i { font-size: 4rem; margin-bottom: 20px; opacity: 0.3; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i></button>
+      <div class="header-title">活动中心</div>
+      <div style="width: 36px;"></div>
+    </div>
+  </header>
+
+  <div class="banner">
+    <div class="banner-title">🎉 新年特惠活动</div>
+    <div class="banner-desc">充值满 100 减 50，限时优惠！</div>
+    <button class="banner-btn" onclick="window.location.href='index.html'">立即参与</button>
+  </div>
+
+  <div class="events-list">
+    <h2 style="margin-bottom: 20px;">🔥 热门活动</h2>
+    
+    <div class="event-card">
+      <div class="event-image">🎁</div>
+      <div class="event-info">
+        <div class="event-title">首充双倍奖励</div>
+        <div class="event-time">⏰ 长期有效</div>
+        <div class="event-desc">首次充值任意金额，即可获得双倍积分奖励！积分可兑换优惠券和专属礼包。</div>
+        <div>
+          <span class="event-tag hot">热门</span>
+          <span class="event-tag">新手专属</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-card">
+      <div class="event-image">💰</div>
+      <div class="event-info">
+        <div class="event-title">充值返现活动</div>
+        <div class="event-time">⏰ 2026/02/01 - 2026/02/28</div>
+        <div class="event-desc">单笔充值满 328 元，返现 5%；满 648 元，返现 10%！返现金额可直接用于下次充值。</div>
+        <div>
+          <span class="event-tag new">新活动</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-card">
+      <div class="event-image">👥</div>
+      <div class="event-info">
+        <div class="event-title">邀请好友得优惠</div>
+        <div class="event-time">⏰ 长期有效</div>
+        <div class="event-desc">邀请好友注册并充值，双方各得 10 元优惠券！邀请越多，奖励越多，上不封顶！</div>
+        <div>
+          <span class="event-tag">推荐</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="coming-soon" style="margin-top: 40px;">
+    <i class="fas fa-calendar-alt"></i>
+    <h3>更多活动即将上线</h3>
+    <p>敬请期待！</p>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="nav-item" onclick="window.location.href='index.html'">
+      <i class="fas fa-home"></i><span>首页</span>
+    </div>
+    <div class="nav-item" onclick="window.location.href='cart.html'">
+      <i class="fas fa-shopping-cart"></i><span>购物车</span>
+    </div>
+    <div class="nav-item" onclick="window.location.href='orders.html'">
+      <i class="fas fa-file-alt"></i><span>订单</span>
+    </div>
+    <div class="nav-item active">
+      <i class="fas fa-gift"></i><span>活动</span>
+    </div>
+  </nav>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    });
+  </script>
+</body>
+</html>

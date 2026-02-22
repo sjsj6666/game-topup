@@ -3,8 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>GameTopUp - 游戏充值平台</title>
+  <meta name="theme-color" content="#6C63FF">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title data-i18n="seo.home.title">GameTopUp - 安全快捷的游戏充值平台</title>
+  <meta name="description" data-i18n="seo.home.desc" content="GameTopUp 提供原神、王者荣耀、崩坏星穹铁道等热门游戏充值服务，安全快捷，优惠多多！">
+  <meta name="keywords" data-i18n="seo.home.keywords" content="游戏充值，原神充值，王者荣耀充值，星穹铁道充值，便宜充值，安全充值">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- 统一配置文件 -->
+  <script src="config.js"></script>
+  
+  <!-- 多语言支持 -->
+  <script src="translations.js"></script>
+  <script src="i18n.js"></script>
+  
+  <!-- SEO 加载器 -->
+  <script src="seo-loader.js"></script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -22,22 +48,35 @@
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
+      --bg-color: #F8F9FA;
+      --card-bg: #FFFFFF;
+    }
+    [data-theme="dark"] {
+      --bg-color: #1A1A2E;
+      --card-bg: #16213E;
+      --text-dark: #E8E8E8;
+      --text-light: #A0A0A0;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+      --shadow-lg: 0 10px 20px rgba(0,0,0,0.3);
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: var(--light-color);
+      background-color: var(--bg-color);
       color: var(--text-dark);
       line-height: 1.6;
       padding-bottom: 70px;
+      transition: background-color 0.3s, color 0.3s;
     }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
     header {
-      background: white;
+      background: var(--card-bg);
       padding: 15px 0;
       position: sticky;
       top: 0;
       z-index: 1000;
       box-shadow: var(--shadow-sm);
+      transition: background-color 0.3s;
     }
     .header-content {
       display: flex;
@@ -51,10 +90,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      text-decoration: none;
     }
     .nav-icons {
       display: flex;
       gap: 20px;
+      align-items: center;
     }
     .nav-icon {
       position: relative;
@@ -74,15 +115,24 @@
       min-width: 18px;
       text-align: center;
     }
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--text-dark);
+      cursor: pointer;
+      padding: 5px;
+    }
     .search-bar {
       padding: 15px;
-      background: white;
+      background: var(--card-bg);
       margin: 10px 15px;
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-sm);
       display: flex;
       align-items: center;
       gap: 10px;
+      transition: background-color 0.3s;
     }
     .search-bar input {
       flex: 1;
@@ -90,6 +140,8 @@
       outline: none;
       font-size: 1rem;
       padding: 8px 0;
+      background: transparent;
+      color: var(--text-dark);
     }
     .search-bar i { color: var(--text-light); }
     .categories {
@@ -102,13 +154,14 @@
     .categories::-webkit-scrollbar { display: none; }
     .category-tag {
       padding: 8px 16px;
-      background: white;
+      background: var(--card-bg);
       border-radius: 20px;
       font-size: 0.9rem;
       white-space: nowrap;
       cursor: pointer;
       transition: all 0.3s;
       border: 1px solid #eee;
+      color: var(--text-dark);
     }
     .category-tag.active {
       background: var(--primary-color);
@@ -125,7 +178,7 @@
       .games-grid { grid-template-columns: repeat(4, 1fr); }
     }
     .game-card {
-      background: white;
+      background: var(--card-bg);
       border-radius: var(--radius-md);
       overflow: hidden;
       box-shadow: var(--shadow-sm);
@@ -159,9 +212,7 @@
       font-size: 0.8rem;
       font-weight: 600;
     }
-    .game-info {
-      padding: 12px;
-    }
+    .game-info { padding: 12px; }
     .game-title {
       font-weight: 600;
       margin-bottom: 5px;
@@ -203,7 +254,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: white;
+      background: var(--card-bg);
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
@@ -220,152 +271,393 @@
       cursor: pointer;
       padding: 5px 15px;
     }
-    .nav-item.active {
-      color: var(--primary-color);
-    }
+    .nav-item.active { color: var(--primary-color); }
     .nav-item i { font-size: 1.2rem; }
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-light);
+    .loading { text-align: center; padding: 40px; color: var(--text-light); }
+    .loading i { font-size: 2rem; animation: spin 1s linear infinite; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-    .empty-state i {
-      font-size: 3rem;
-      margin-bottom: 15px;
-      opacity: 0.5;
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-light); }
+    .empty-state i { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      padding: 15px;
+      border-radius: var(--radius-md);
+      margin: 20px;
+      text-align: center;
+    }
+    .install-prompt {
+      position: fixed;
+      bottom: 80px;
+      left: 15px;
+      right: 15px;
+      background: var(--card-bg);
+      padding: 15px 20px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      display: none;
+      align-items: center;
+      gap: 15px;
+      z-index: 999;
+      border: 2px solid var(--primary-color);
+    }
+    .install-prompt.show { display: flex; animation: slideUp 0.3s ease-out; }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .install-icon {
+      width: 40px; height: 40px;
+      background: var(--primary-color);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.2rem;
+    }
+    .install-text { flex: 1; }
+    .install-title { font-weight: 600; color: var(--text-dark); }
+    .install-desc { font-size: 0.8rem; color: var(--text-light); }
+    .install-btn {
+      padding: 8px 20px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .install-close {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 5px;
     }
   </style>
 </head>
 <body>
+  <!-- 头部 -->
   <header>
     <div class="container header-content">
-      <div class="logo">
+      <a href="index.html" class="logo">
         <i class="fas fa-gamepad"></i>
-        <span>GameTopUp</span>
-      </div>
+        <span data-i18n="app.name">GameTopUp</span>
+      </a>
       <div class="nav-icons">
-        <div class="nav-icon">
+        <!-- 语言切换器会自动插入到这里 -->
+        <button class="theme-toggle" id="themeToggle" title="切换深色模式">
+          <i class="fas fa-moon"></i>
+        </button>
+        <div class="nav-icon" onclick="showNotifications()">
           <i class="fas fa-bell"></i>
           <span class="badge">3</span>
         </div>
-        <div class="nav-icon" id="cartIcon">
+        <div class="nav-icon" id="cartIcon" onclick="goToCart()">
           <i class="fas fa-shopping-cart"></i>
           <span class="badge" id="cartBadge">0</span>
         </div>
       </div>
     </div>
   </header>
+
+  <!-- 搜索栏 -->
   <div class="search-bar">
     <i class="fas fa-search"></i>
-    <input type="text" id="searchInput" placeholder="搜索游戏...">
+    <input type="text" id="searchInput" data-i18n="home.search.placeholder" placeholder="搜索游戏...">
   </div>
+
+  <!-- 分类标签 -->
   <div class="categories">
-    <div class="category-tag active" data-filter="all">全部</div>
-    <div class="category-tag" data-filter="热门">🔥 热门</div>
-    <div class="category-tag" data-filter="开放世界">开放世界</div>
-    <div class="category-tag" data-filter="MOBA">MOBA</div>
-    <div class="category-tag" data-filter="角色扮演">角色扮演</div>
-    <div class="category-tag" data-filter="动作">动作竞技</div>
+    <div class="category-tag active" data-filter="all" data-i18n="home.category.all">全部</div>
+    <div class="category-tag" data-filter="热门" data-i18n="home.category.hot">🔥 热门</div>
+    <div class="category-tag" data-filter="开放世界" data-i18n="home.category.openworld">开放世界</div>
+    <div class="category-tag" data-filter="MOBA" data-i18n="home.category.moba">MOBA</div>
+    <div class="category-tag" data-filter="角色扮演" data-i18n="home.category.rpg">角色扮演</div>
+    <div class="category-tag" data-filter="动作" data-i18n="home.category.action">动作竞技</div>
   </div>
+
+  <!-- 主内容区 -->
   <div class="container">
-    <div class="games-grid" id="gamesGrid"></div>
+    <!-- 加载状态 -->
+    <div class="loading" id="loadingState">
+      <i class="fas fa-spinner"></i>
+      <p data-i18n="common.loading">正在加载游戏...</p>
+    </div>
+    
+    <!-- 错误状态 -->
+    <div class="error-message" id="errorState" style="display: none;">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p data-i18n="common.error">加载失败，请检查网络连接或 config.js 配置</p>
+      <button onclick="loadGames()" style="margin-top: 10px; padding: 8px 20px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer;" data-i18n="common.retry">重试</button>
+    </div>
+    
+    <!-- 游戏列表 -->
+    <div class="games-grid" id="gamesGrid" style="display: none;"></div>
+    
+    <!-- 空状态 -->
     <div class="empty-state" id="emptyState" style="display: none;">
       <i class="fas fa-search"></i>
-      <p>暂无匹配的游戏</p>
+      <p data-i18n="home.empty">暂无匹配的游戏</p>
     </div>
   </div>
+
+  <!-- PWA 安装提示 -->
+  <div class="install-prompt" id="installPrompt">
+    <div class="install-icon"><i class="fas fa-download"></i></div>
+    <div class="install-text">
+      <div class="install-title" data-i18n="home.install.title">安装 GameTopUp</div>
+      <div class="install-desc" data-i18n="home.install.desc">添加到桌面，快速访问</div>
+    </div>
+    <button class="install-btn" id="installBtn" data-i18n="home.install.btn">安装</button>
+    <button class="install-close" id="installClose">&times;</button>
+  </div>
+
+  <!-- 底部导航 -->
   <nav class="bottom-nav">
     <div class="nav-item active">
       <i class="fas fa-home"></i>
-      <span>首页</span>
+      <span data-i18n="nav.home">首页</span>
     </div>
-    <div class="nav-item">
-      <i class="fas fa-list"></i>
-      <span>分类</span>
+<div class="nav-item" onclick="window.location.href='categories.html'">
+        <i class="fas fa-list"></i>
+      <span data-i18n="nav.categories">分类</span>
     </div>
-    <div class="nav-item">
+<div class="nav-item" onclick="window.location.href='events.html'">
       <i class="fas fa-gift"></i>
-      <span>活动</span>
+      <span data-i18n="nav.activities">活动</span>
     </div>
-    <div class="nav-item" onclick="window.location.href='profile.html'">
+    <div class="nav-item" onclick="goToProfile()">
       <i class="fas fa-user"></i>
-      <span>我的</span>
+      <span data-i18n="nav.profile">我的</span>
     </div>
   </nav>
-  <script src="game-data.js"></script>
+
   <script>
-    const games = [
-      { id: 'genshin', name: '原神', tags: ['开放世界', '角色扮演'], price: 6, originalPrice: 6, discount: null, gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', icon: '⚔️' },
-      { id: 'honor', name: '王者荣耀', tags: ['MOBA', '5V5'], price: 1, originalPrice: 1, discount: null, gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', icon: '👑' },
-      { id: 'starrail', name: '崩坏：星穹铁道', tags: ['策略', '回合制'], price: 6, originalPrice: 6, discount: null, gradient: 'linear-gradient(135deg, #834d9b 0%, #d04ed6 100%)', icon: '🚀' },
-      { id: 'naraka', name: '永劫无间', tags: ['动作', '大逃杀'], price: 6, originalPrice: 6, discount: null, gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', icon: '⚔️' },
-      { id: 'mingchao', name: '鸣潮', tags: ['开放世界', '动作'], price: 6, originalPrice: 8, discount: '25% OFF', gradient: 'linear-gradient(135deg, #0f0c29 0%, #302b63 100%)', icon: '🌊' },
-      { id: 'steam', name: 'Steam 钱包', tags: ['平台', '通用'], price: 30, originalPrice: 30, discount: null, gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', icon: '🎮' }
-    ];
+    // ==================== 全局变量 ====================
+    let games = [];
     let cartCount = 0;
-    function renderGames(filter = 'all', searchQuery = '') {
+    let deferredPrompt = null;
+    let currentFilter = 'all';
+    let searchQuery = '';
+
+    // ==================== 深色模式 ====================
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateThemeIcon(next);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.querySelector('#themeToggle i');
+      if (theme === 'dark') {
+        icon.className = 'fas fa-sun';
+      } else {
+        icon.className = 'fas fa-moon';
+      }
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+    // ==================== 从云端加载游戏 ====================
+    async function loadGames() {
+      const loading = document.getElementById('loadingState');
+      const error = document.getElementById('errorState');
       const grid = document.getElementById('gamesGrid');
-      const emptyState = document.getElementById('emptyState');
-      grid.innerHTML = '';
+      
+      loading.style.display = 'block';
+      error.style.display = 'none';
+      grid.style.display = 'none';
+      
+      try {
+        // 检查 config.js 是否已配置
+        if (typeof db === 'undefined' || SUPABASE_CONFIG.url.includes('YOUR_PROJECT_ID')) {
+          throw new Error('未配置 Supabase');
+        }
+
+        // 从 Supabase 获取游戏数据
+        const { data, error } = await db
+          .from('games')
+          .select('*')
+          .eq('active', true)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        games = data || [];
+        
+        if (games.length === 0) {
+          // 如果云端没有数据，使用示例数据
+          games = getSampleGames();
+        }
+        
+        applyFilters();
+        
+        loading.style.display = 'none';
+        grid.style.display = 'grid';
+        
+      } catch (err) {
+        console.error('加载游戏失败:', err);
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        
+        // 使用示例数据
+        games = getSampleGames();
+        applyFilters();
+        grid.style.display = 'grid';
+      }
+    }
+
+    // 示例数据（当 Supabase 未配置或无数据时使用）
+    function getSampleGames() {
+      return [
+        { id: 'genshin', name: '原神', name_en: 'Genshin Impact', description: '开放世界冒险 RPG', category: ['开放世界', '角色扮演'], gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', icon: '⚔️', price: 6, tags: ['开放世界', '角色扮演'], active: true },
+        { id: 'honor', name: '王者荣耀', name_en: 'Honor of Kings', description: '5V5 MOBA 竞技', category: ['MOBA', '5V5'], gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', icon: '👑', price: 1, tags: ['MOBA', '竞技'], active: true },
+        { id: 'starrail', name: '崩坏：星穹铁道', name_en: 'Honkai Star Rail', description: '银河冒险策略游戏', category: ['策略', '回合制'], gradient: 'linear-gradient(135deg, #834d9b 0%, #d04ed6 100%)', icon: '🚀', price: 6, tags: ['策略', '科幻'], active: true },
+        { id: 'naraka', name: '永劫无间', name_en: 'Naraka', description: '武侠大逃杀', category: ['动作', '大逃杀'], gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', icon: '⚔️', price: 6, tags: ['动作', '竞技'], active: true },
+        { id: 'mingchao', name: '鸣潮', name_en: 'Wuthering Waves', description: '开放世界动作', category: ['开放世界', '动作'], gradient: 'linear-gradient(135deg, #0f0c29 0%, #302b63 100%)', icon: '🌊', price: 6, tags: ['开放世界', '动作'], active: true },
+        { id: 'steam', name: 'Steam 钱包', name_en: 'Steam Wallet', description: '游戏平台充值', category: ['平台', '通用'], gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', icon: '🎮', price: 30, tags: ['平台', '通用'], active: true }
+      ];
+    }
+
+    // 应用筛选
+    function applyFilters() {
+      const grid = document.getElementById('gamesGrid');
+      const empty = document.getElementById('emptyState');
+      
       let filtered = games.filter(game => {
-        const matchCategory = filter === 'all' || game.tags.includes(filter);
-        const matchSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchCategory = currentFilter === 'all' || 
+          (game.category && game.category.some(cat => cat.includes(currentFilter)));
+        const matchSearch = !searchQuery || 
+          game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (game.name_en && game.name_en.toLowerCase().includes(searchQuery.toLowerCase()));
         return matchCategory && matchSearch;
       });
+
       if (filtered.length === 0) {
-        emptyState.style.display = 'block';
+        grid.style.display = 'none';
+        empty.style.display = 'block';
         return;
       }
-      emptyState.style.display = 'none';
-      filtered.forEach(game => {
-        const card = document.createElement('a');
-        card.className = 'game-card';
-        card.href = `game-detail.html?game=${game.id}`;
-        const discountHtml = game.discount ? `<div class="game-discount">${game.discount}</div>` : '';
-        const originalPriceHtml = game.originalPrice > game.price ? `<span class="price-original">¥${game.originalPrice}</span>` : '';
-        card.innerHTML = `
-          <div class="game-image" style="background: ${game.gradient}">
-            <span style="font-size: 3rem;">${game.icon}</span>
-            ${discountHtml}
+      
+      empty.style.display = 'none';
+      grid.style.display = 'grid';
+      grid.innerHTML = filtered.map(game => `
+        <a href="game-detail.html?game=${game.id}" class="game-card">
+          <div class="game-image" style="background: ${game.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}">
+            <span style="font-size: 3rem;">${game.icon || '🎮'}</span>
+            ${game.discount ? `<div class="game-discount">${game.discount}</div>` : ''}
           </div>
           <div class="game-info">
             <div class="game-title">${game.name}</div>
             <div class="game-tags">
-              ${game.tags.map(tag => `<span class="game-tag">${tag}</span>`).join('')}
+              ${(game.tags || game.category || []).slice(0, 3).map(tag => `<span class="game-tag">${tag}</span>`).join('')}
             </div>
             <div class="game-price">
-              <span class="price-current">¥${game.price}起</span>
-              ${originalPriceHtml}
+              <span class="price-current">${SITE_CONFIG?.currency || '¥'}${game.price || 6}起</span>
+              ${game.original_price && game.original_price > game.price ? `<span class="price-original">${SITE_CONFIG?.currency || '¥'}${game.original_price}</span>` : ''}
             </div>
           </div>
-        `;
-        grid.appendChild(card);
-      });
+        </a>
+      `).join('');
     }
+
+    // ==================== 搜索功能 ====================
     document.getElementById('searchInput').addEventListener('input', (e) => {
-      const activeCat = document.querySelector('.category-tag.active').dataset.filter;
-      renderGames(activeCat, e.target.value);
+      searchQuery = e.target.value.trim();
+      applyFilters();
     });
+
+    // ==================== 分类筛选 ====================
     document.querySelectorAll('.category-tag').forEach(tag => {
       tag.addEventListener('click', () => {
         document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
         tag.classList.add('active');
-        const filter = tag.dataset.filter;
-        const search = document.getElementById('searchInput').value;
-        renderGames(filter, search);
+        currentFilter = tag.dataset.filter;
+        applyFilters();
       });
     });
-    document.getElementById('cartIcon').addEventListener('click', () => {
-      window.location.href = 'cart.html';
-    });
-    document.addEventListener('DOMContentLoaded', () => {
-      renderGames();
+
+    // ==================== 购物车 ====================
+    function updateCartBadge() {
       const cart = JSON.parse(localStorage.getItem('gameTopUpCart') || '[]');
       cartCount = cart.length;
       document.getElementById('cartBadge').textContent = cartCount;
+    }
+
+    window.goToCart = function() {
+      window.location.href = 'cart.html';
+    };
+
+    // ==================== 导航 ====================
+    window.goToProfile = function() {
+      window.location.href = 'profile.html';
+    };
+
+    window.showComingSoon = function() {
+      alert(t('notify.comingSoon') || '🚧 功能开发中，敬请期待！');
+    };
+
+    window.showNotifications = function() {
+      alert(t('notify.noNotifications') || '🔔 暂无新通知');
+    };
+
+    // ==================== PWA 安装 ====================
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installPrompt').classList.add('show');
     });
-    console.log('🏮 GameTopUp 2026 丙午马年版');
-    console.log('✨ 祝您游戏愉快，十连双金，单抽出奇迹！');
+
+    document.getElementById('installBtn').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          document.getElementById('installPrompt').classList.remove('show');
+        }
+        deferredPrompt = null;
+      }
+    });
+
+    document.getElementById('installClose').addEventListener('click', () => {
+      document.getElementById('installPrompt').classList.remove('show');
+    });
+
+    // ==================== Service Worker ====================
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('✅ Service Worker 已注册'))
+        .catch(err => console.error('❌ Service Worker 注册失败:', err));
+    }
+
+    // ==================== 页面初始化 ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      loadGames();
+      updateCartBadge();
+      
+      // 自动检查配置
+      if (typeof checkConfig === 'function') {
+        checkConfig();
+      }
+    });
+
+    // ==================== 控制台信息 ====================
+    console.log('🎮 GameTopUp - 游戏充值平台');
+    console.log('☁️ 云端版 - Supabase 驱动');
+    console.log('🌍 多语言支持 - 中文/English');
+    console.log('✨ 祝您游戏愉快，十连双金！');
   </script>
 </body>
 </html>
