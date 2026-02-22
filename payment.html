@@ -5,15 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-i18n="seo.payment.title">支付确认 - GameTopUp</title>
   <meta name="description" data-i18n="seo.payment.desc" content="安全支付，支持多种支付方式">
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="translations.js"></script>
   <script src="i18n.js"></script>
   <script src="seo-loader.js"></script>
-  
   <style>
+    /* 保持原有样式不变 */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --primary-color: #6C63FF;
@@ -201,7 +200,7 @@
         orderData = {
           items: cart,
           total: cart.reduce((sum, item) => sum + item.package.price * item.quantity, 0),
-          orderId: 'ORD' + Date.now()
+          orderId: 'ORD' + Date.now().toString(36).toUpperCase()
         };
       } else {
         cart = sessionStorage.getItem('pendingOrder');
@@ -233,17 +232,41 @@
       if (!code) { resultEl.className = 'coupon-result error'; resultEl.textContent = '⚠️ 请输入优惠码'; return; }
 
       try {
-        const { data, error } = await db.from('coupons').select('*').eq('code', code).eq('active', true).single();
-        if (error || !data) { resultEl.className = 'coupon-result error'; resultEl.textContent = '❌ 优惠码无效或已过期'; appliedCoupon = null; discountAmount = 0; updateTotalDisplay(); return; }
-        if (originalTotal < data.min_order) { resultEl.className = 'coupon-result error'; resultEl.textContent = `⚠️ 订单满${SITE_CONFIG?.currency || '¥'}${data.min_order}才可使用`; appliedCoupon = null; discountAmount = 0; updateTotalDisplay(); return; }
+        // 🔧 修复：使用 limit(1) 替代 single() 避免 406 错误
+        const { data, error } = await db
+          .from('coupons')
+          .select('*')
+          .eq('code', code)
+          .eq('active', true)
+          .limit(1);
+        
+        if (error || !data || data.length === 0) { 
+          resultEl.className = 'coupon-result error'; 
+          resultEl.textContent = '❌ 优惠码无效或已过期'; 
+          appliedCoupon = null; 
+          discountAmount = 0; 
+          updateTotalDisplay(); 
+          return; 
+        }
+        
+        const coupon = data[0];
+        
+        if (originalTotal < coupon.min_order) { 
+          resultEl.className = 'coupon-result error'; 
+          resultEl.textContent = `⚠️ 订单满${SITE_CONFIG?.currency || '¥'}${coupon.min_order}才可使用`; 
+          appliedCoupon = null; 
+          discountAmount = 0; 
+          updateTotalDisplay(); 
+          return; 
+        }
 
-        if (data.type === 'percent') discountAmount = originalTotal * (1 - data.value);
-        else discountAmount = data.value;
+        if (coupon.type === 'percent') discountAmount = originalTotal * (1 - coupon.value);
+        else discountAmount = coupon.value;
         if (discountAmount > originalTotal) discountAmount = originalTotal;
 
-        appliedCoupon = { code: data.code, ...data };
+        appliedCoupon = { code: coupon.code, ...coupon };
         resultEl.className = 'coupon-result success';
-        resultEl.textContent = `✅ 优惠成功！${data.description}，节省${SITE_CONFIG?.currency || '¥'}${discountAmount.toFixed(2)}`;
+        resultEl.textContent = `✅ 优惠成功！${coupon.description}，节省${SITE_CONFIG?.currency || '¥'}${discountAmount.toFixed(2)}`;
         updateTotalDisplay();
       } catch (err) {
         console.error('优惠券验证失败:', err);
@@ -264,23 +287,28 @@
     }
 
     window.processPayment = async function() {
-      const gameAccount = document.getElementById('gameAccount').value.trim();
-      const confirmAccount = document.getElementById('confirmAccount').value.trim();
+      const gameAccount = document.getElementById('gameAccount')?.value.trim();
+      const confirmAccount = document.getElementById('confirmAccount')?.value.trim();
 
       if (!gameAccount) { alert('⚠️ 请输入游戏账号'); return; }
       if (gameAccount !== confirmAccount) { alert('⚠️ 两次输入的账号不一致'); return; }
       if (gameAccount.length < 5) { alert('⚠️ 账号格式不正确'); return; }
 
       const payBtn = document.getElementById('payBtn');
-      payBtn.disabled = true;
-      payBtn.innerHTML = '<div style="width:20px;height:20px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;"></div> 处理中...';
+      if (payBtn) {
+        payBtn.disabled = true;
+        payBtn.innerHTML = '<div style="width:20px;height:20px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;"></div> 处理中...';
+      }
 
       try {
         const finalTotal = originalTotal - discountAmount;
         const firstItem = orderData.items ? orderData.items[0] : orderData;
+        
+        // 🔧 确保订单 ID 一定有值
+        const orderId = orderData.orderId || ('ORD' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 8).toUpperCase());
 
         const orderToSave = {
-          id: orderData.orderId,
+          id: orderId,
           user_id: null,
           game_id: firstItem?.gameId || firstItem?.game || 'unknown',
           package_id: firstItem?.package?.id || null,
@@ -302,13 +330,23 @@
         sessionStorage.removeItem('cartCheckout');
         sessionStorage.removeItem('pendingOrder');
 
-        document.getElementById('successOrder').textContent = `订单号：${orderData.orderId}`;
-        document.getElementById('successOverlay').classList.add('show');
+        // 🔧 修复：检查元素是否存在
+        const successOrderEl = document.getElementById('successOrder');
+        if (successOrderEl) {
+          successOrderEl.textContent = `订单号：${orderId}`;
+        }
+        
+        const successOverlay = document.getElementById('successOverlay');
+        if (successOverlay) {
+          successOverlay.classList.add('show');
+        }
       } catch (err) {
         console.error('支付失败:', err);
         alert('❌ 支付失败：' + err.message);
-        payBtn.disabled = false;
-        payBtn.textContent = '立即支付';
+        if (payBtn) {
+          payBtn.disabled = false;
+          payBtn.textContent = '立即支付';
+        }
       }
     };
 
