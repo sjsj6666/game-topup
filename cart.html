@@ -112,25 +112,25 @@
       // 🔧 修复：检查 cartCount 元素是否存在
       const cartCountEl = document.getElementById('cartCount');
       if (cartCountEl) {
-        cartCountEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCountEl.textContent = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
       }
 
       let total = 0;
 
       list.innerHTML = cart.map((item, index) => {
-        const itemTotal = item.package.price * item.quantity;
+        const itemTotal = (item.package?.price || 0) * (item.quantity || 1);
         total += itemTotal;
 
         return `
           <div class="cart-item">
             <div class="item-image"><i class="fas fa-gamepad"></i></div>
             <div class="item-details">
-              <div class="item-name">${item.gameName}</div>
-              <div class="item-package">${item.package.name}</div>
-              <div class="item-price">${SITE_CONFIG?.currency || '¥'}${item.package.price}</div>
+              <div class="item-name">${item.gameName || '游戏'}</div>
+              <div class="item-package">${item.package?.name || '套餐'}</div>
+              <div class="item-price">${SITE_CONFIG?.currency || '¥'}${item.package?.price || 0}</div>
               <div class="quantity-control">
                 <button class="qty-btn" onclick="updateQuantity(${index}, -1)">-</button>
-                <span>${item.quantity}</span>
+                <span>${item.quantity || 1}</span>
                 <button class="qty-btn" onclick="updateQuantity(${index}, 1)">+</button>
               </div>
             </div>
@@ -147,8 +147,9 @@
     }
 
     window.updateQuantity = function(index, delta) {
+      if (!cart[index]) return;
       if (cart[index].quantity + delta < 1) return;
-      cart[index].quantity += delta;
+      cart[index].quantity = (cart[index].quantity || 1) + delta;
       localStorage.setItem('gameTopUpCart', JSON.stringify(cart));
       renderCart();
     };
