@@ -5,14 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-i18n="seo.cart.title">购物车 - GameTopUp</title>
   <meta name="description" data-i18n="seo.cart.desc" content="查看你的购物车，管理已选择的游戏充值套餐">
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="translations.js"></script>
   <script src="i18n.js"></script>
   <script src="seo-loader.js"></script>
-  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -66,7 +64,6 @@
 
   <div class="container">
     <div class="cart-list" id="cartList"></div>
-    
     <div class="empty-cart" id="emptyCart" style="display: none;">
       <i class="fas fa-shopping-cart"></i>
       <h3 data-i18n="cart.empty.title">购物车是空的</h3>
@@ -95,7 +92,13 @@
       const list = document.getElementById('cartList');
       const empty = document.getElementById('emptyCart');
       const bar = document.getElementById('checkoutBar');
-
+      
+      // 🔧 修复：先检查元素是否存在
+      if (!list || !empty || !bar) {
+        console.warn('⚠️ 购物车页面元素未找到');
+        return;
+      }
+      
       if (cart.length === 0) {
         list.innerHTML = '';
         empty.style.display = 'block';
@@ -105,7 +108,12 @@
 
       empty.style.display = 'none';
       bar.style.display = 'flex';
-      document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+      
+      // 🔧 修复：检查 cartCount 元素是否存在
+      const cartCountEl = document.getElementById('cartCount');
+      if (cartCountEl) {
+        cartCountEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+      }
 
       let total = 0;
 
@@ -131,7 +139,11 @@
         `;
       }).join('');
 
-      document.getElementById('totalAmount').textContent = `${SITE_CONFIG?.currency || '¥'}${total.toFixed(2)}`;
+      // 🔧 修复：检查 totalAmount 元素是否存在
+      const totalAmountEl = document.getElementById('totalAmount');
+      if (totalAmountEl) {
+        totalAmountEl.textContent = `${SITE_CONFIG?.currency || '¥'}${total.toFixed(2)}`;
+      }
     }
 
     window.updateQuantity = function(index, delta) {
