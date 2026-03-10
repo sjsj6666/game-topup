@@ -3,12 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>游戏分类 - GameTopUp</title>
+  <title data-i18n="seo.categories.title">游戏分类 - GameTopUp</title>
+  <meta name="description" data-i18n="seo.categories.desc" content="浏览所有游戏分类">
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="translations.js"></script>
   <script src="i18n.js"></script>
+  <script src="seo-loader.js"></script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root { --primary: #6C63FF; --light: #F8F9FA; --card-bg: #FFFFFF; --text-dark: #333; --text-light: #666; }
@@ -60,7 +64,7 @@
   <header class="header">
     <div class="container header-content">
       <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i></button>
-      <div class="header-title">游戏分类</div>
+      <div class="header-title" data-i18n="categories.title">游戏分类</div>
       <div style="width: 36px;"></div>
     </div>
   </header>
@@ -73,27 +77,28 @@
 
   <nav class="bottom-nav">
     <div class="nav-item" onclick="window.location.href='index.html'">
-      <i class="fas fa-home"></i><span>首页</span>
+      <i class="fas fa-home"></i><span data-i18n="nav.home">首页</span>
     </div>
     <div class="nav-item active">
-      <i class="fas fa-list"></i><span>分类</span>
+      <i class="fas fa-list"></i><span data-i18n="nav.categories">分类</span>
     </div>
     <div class="nav-item" onclick="window.location.href='orders.html'">
-      <i class="fas fa-file-alt"></i><span>订单</span>
+      <i class="fas fa-file-alt"></i><span data-i18n="common.orders">订单</span>
     </div>
     <div class="nav-item" onclick="window.location.href='profile.html'">
-      <i class="fas fa-user"></i><span>我的</span>
+      <i class="fas fa-user"></i><span data-i18n="nav.profile">我的</span>
     </div>
   </nav>
 
   <script>
+    // 🔧 使用翻译函数获取分类名称
     const categories = [
-      { id: 'openworld', name: '开放世界', icon: '🌍', color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', filter: '开放世界' },
-      { id: 'moba', name: 'MOBA', icon: '⚔️', color: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', filter: 'MOBA' },
-      { id: 'rpg', name: '角色扮演', icon: '🎭', color: 'linear-gradient(135deg, #834d9b 0%, #d04ed6 100%)', filter: '角色扮演' },
-      { id: 'action', name: '动作竞技', icon: '💥', color: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', filter: '动作' },
-      { id: 'strategy', name: '策略', icon: '🧠', color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', filter: '策略' },
-      { id: 'platform', name: '平台充值', icon: '🎮', color: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', filter: '平台' }
+      { id: 'openworld', name: t('category.openworld'), icon: '🌍', color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', filter: t('category.openworld') },
+      { id: 'moba', name: t('category.moba'), icon: '⚔️', color: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', filter: t('category.moba') },
+      { id: 'rpg', name: t('category.rpg'), icon: '🎭', color: 'linear-gradient(135deg, #834d9b 0%, #d04ed6 100%)', filter: t('category.rpg') },
+      { id: 'action', name: t('category.action'), icon: '💥', color: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', filter: t('category.action') },
+      { id: 'strategy', name: t('category.strategy'), icon: '🧠', color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', filter: t('category.strategy') },
+      { id: 'platform', name: t('category.platform'), icon: '🎮', color: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', filter: t('category.platform') }
     ];
 
     async function loadCategories() {
@@ -110,11 +115,14 @@
         });
       });
       
+      // 🔧 使用翻译函数
+      const gamesText = t('category.games') || '款游戏';
+      
       grid.innerHTML = categories.map(cat => `
         <a href="index.html?category=${encodeURIComponent(cat.filter)}" class="category-card">
           <div class="category-icon" style="background: ${cat.color}">${cat.icon}</div>
           <div class="category-name">${cat.name}</div>
-          <div class="category-count">${categoryCount[cat.filter] || 0} 款游戏</div>
+          <div class="category-count">${categoryCount[cat.filter] || 0} ${gamesText}</div>
           <div class="category-games">
             <span class="game-tag">${cat.filter}</span>
           </div>
@@ -126,6 +134,19 @@
       loadCategories();
       const savedTheme = localStorage.getItem('theme') || 'light';
       document.documentElement.setAttribute('data-theme', savedTheme);
+      
+      // 🔧 应用语言翻译
+      if (typeof applyLanguage === 'function') {
+        applyLanguage();
+      }
+    });
+    
+    // 🔧 监听语言切换事件
+    window.addEventListener('languageChanged', () => {
+      if (typeof applyLanguage === 'function') {
+        applyLanguage();
+      }
+      loadCategories();  // 重新加载分类以应用新语言
     });
   </script>
 </body>

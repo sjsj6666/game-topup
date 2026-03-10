@@ -236,7 +236,15 @@ const TRANSLATIONS = {
     'seo.orders.title': '我的订单 - GameTopUp',
     'seo.orders.desc': '查看你的订单历史和状态。',
     'seo.profile.title': '个人中心 - GameTopUp',
-    'seo.profile.desc': '管理你的账户信息和设置。'
+    'seo.profile.desc': '管理你的账户信息和设置。',
+    
+    //分类
+    'category.openworld': '开放世界',
+    'category.moba': 'MOBA',
+    'category.rpg': '角色扮演',
+    'category.action': '动作竞技',
+    'category.strategy': '策略',
+    'category.platform': '平台充值',
   },
   
   // 🔹 英文
@@ -469,7 +477,15 @@ const TRANSLATIONS = {
     'seo.orders.title': 'My Orders - GameTopUp',
     'seo.orders.desc': 'View your order history and status.',
     'seo.profile.title': 'My Profile - GameTopUp',
-    'seo.profile.desc': 'Manage your account info and settings.'
+    'seo.profile.desc': 'Manage your account info and settings.',
+    
+    //categories
+    'category.openworld': 'Open World',
+    'category.moba': 'MOBA',
+    'category.rpg': 'RPG',
+    'category.action': 'Action',
+    'category.strategy': 'Strategy',
+    'category.platform': 'Platform',
   }
 };
 
