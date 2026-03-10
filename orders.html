@@ -7,6 +7,8 @@
   <meta name="description" data-i18n="seo.orders.desc" content="查看你的订单历史和状态">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="translations.js"></script>
@@ -32,14 +34,13 @@
       --text-light: #A0A0A0;
     }
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg-color); 
       color: var(--text-dark); 
       padding-bottom: 70px; 
     }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
     
-    /* 头部 */
     .header { 
       background: var(--card-bg); 
       padding: 15px 0; 
@@ -48,296 +49,377 @@
       z-index: 1000; 
       box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
     }
-    .header-content { 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-    }
-    .back-btn { 
-      background: none; 
-      border: none; 
-      font-size: 1rem; 
-      color: var(--text-dark); 
-      cursor: pointer; 
-    }
-    .header-title { 
-      font-size: 1.2rem; 
-      font-weight: 700; 
-    }
+    .header-content { display: flex; align-items: center; justify-content: space-between; }
+    .back-btn { background: none; border: none; font-size: 1rem; color: var(--text-dark); cursor: pointer; }
+    .header-title { font-size: 1.2rem; font-weight: 700; }
     
-    /* 订单标签 */
     .order-tabs { 
-      display: flex; 
-      background: var(--card-bg); 
-      padding: 10px 15px; 
-      gap: 10px; 
-      overflow-x: auto; 
-      scrollbar-width: none; 
+      display: flex; background: var(--card-bg); padding: 10px 15px; gap: 10px; 
+      overflow-x: auto; scrollbar-width: none; 
     }
     .order-tabs::-webkit-scrollbar { display: none; }
     .tab-btn { 
-      padding: 8px 20px; 
-      border: none; 
-      background: #f0f0f0; 
-      border-radius: 20px; 
-      font-size: 0.9rem; 
-      cursor: pointer; 
-      white-space: nowrap; 
-      color: var(--text-dark); 
+      padding: 8px 20px; border: none; background: #f0f0f0; border-radius: 20px; 
+      font-size: 0.9rem; cursor: pointer; white-space: nowrap; color: var(--text-dark); 
     }
-    .tab-btn.active { 
-      background: var(--primary-color); 
-      color: white; 
-    }
+    .tab-btn.active { background: var(--primary-color); color: white; }
     
-    /* 订单列表 */
     .order-list { padding: 15px 0; }
     .order-card { 
-      background: var(--card-bg); 
-      border-radius: 16px; 
-      margin: 15px; 
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-      overflow: hidden; 
-      cursor: pointer; 
+      background: var(--card-bg); border-radius: 16px; margin: 15px; 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; cursor: pointer; 
     }
     .order-header { 
-      padding: 12px 15px; 
-      border-bottom: 1px solid #eee; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      background: #fafafa; 
+      padding: 12px 15px; border-bottom: 1px solid #eee; display: flex; 
+      justify-content: space-between; align-items: center; background: #fafafa; 
     }
-    .order-id { 
-      font-size: 0.85rem; 
-      color: var(--text-light); 
-    }
-    
-    /* 🔧 订单状态标签 - 修复深色模式可见性 */
-    .order-status { 
-      padding: 4px 12px; 
-      border-radius: 12px; 
-      font-size: 0.8rem; 
-      font-weight: 600; 
-    }
-    /* 白色模式 */
-    .status-completed { 
-      background: #d4edda; 
-      color: #155724; 
-    }
-    .status-pending { 
-      background: #fff3cd; 
-      color: #856404; 
-    }
-    .status-cancelled { 
-      background: #f8d7da; 
-      color: #721c24; 
-    }
-    .status-refunded { 
-      background: #e2e3e5; 
-      color: #383d41; 
-    }
-    /* 深色模式 */
-    [data-theme="dark"] .status-completed { 
-      background: #228b22; 
-      color: #d4edda; 
-    }
-    [data-theme="dark"] .status-pending { 
-      background: #b8860b; 
-      color: #fff3cd; 
-    }
-    [data-theme="dark"] .status-cancelled { 
-      background: #dc143c; 
-      color: #f8d7da; 
-    }
-    [data-theme="dark"] .status-refunded { 
-      background: #696969; 
-      color: #e2e3e5; 
-    }
+    .order-id { font-size: 0.85rem; color: var(--text-light); }
+    .order-status { padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+    .status-completed { background: #d4edda; color: #155724; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    .status-refunded { background: #e2e3e5; color: #383d41; }
+    [data-theme="dark"] .status-completed { background: #228b22; color: #d4edda; }
+    [data-theme="dark"] .status-pending { background: #b8860b; color: #fff3cd; }
+    [data-theme="dark"] .status-cancelled { background: #dc143c; color: #f8d7da; }
+    [data-theme="dark"] .status-refunded { background: #696969; color: #e2e3e5; }
     
     .order-body { padding: 15px; }
     .order-item { 
-      display: flex; 
-      gap: 15px; 
-      margin-bottom: 15px; 
-      padding-bottom: 15px; 
+      display: flex; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; 
       border-bottom: 1px dashed #eee; 
     }
-    .order-item:last-child { 
-      margin-bottom: 0; 
-      padding-bottom: 0; 
-      border-bottom: none; 
-    }
+    .order-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
     .item-icon { 
-      width: 50px; 
-      height: 50px; 
-      border-radius: 12px; 
+      width: 50px; height: 50px; border-radius: 12px; 
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      color: white; 
-      font-size: 1.2rem; 
-      flex-shrink: 0; 
+      display: flex; align-items: center; justify-content: center; 
+      color: white; font-size: 1.2rem; flex-shrink: 0; 
     }
     .item-info { flex: 1; }
-    .item-name { 
-      font-weight: 600; 
-      margin-bottom: 5px; 
-    }
-    .item-package { 
-      font-size: 0.85rem; 
-      color: var(--text-light); 
-      margin-bottom: 5px; 
-    }
-    .item-account { 
-      font-size: 0.8rem; 
-      color: var(--text-light); 
-    }
-    .item-price { 
-      text-align: right; 
-      font-weight: 700; 
-      color: var(--primary-color); 
-    }
+    .item-name { font-weight: 600; margin-bottom: 5px; }
+    .item-package { font-size: 0.85rem; color: var(--text-light); margin-bottom: 5px; }
+    .item-account { font-size: 0.8rem; color: var(--text-light); }
+    .item-price { text-align: right; font-weight: 700; color: var(--primary-color); }
     .order-footer { 
-      padding: 12px 15px; 
-      border-top: 1px solid #eee; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
+      padding: 12px 15px; border-top: 1px solid #eee; 
+      display: flex; justify-content: space-between; align-items: center; 
     }
-    .order-time { 
-      font-size: 0.8rem; 
-      color: var(--text-light); 
-    }
-    .order-total { 
-      font-size: 1.1rem; 
-      font-weight: 700; 
-      color: var(--primary-color); 
-    }
+    .order-time { font-size: 0.8rem; color: var(--text-light); }
+    .order-total { font-size: 1.1rem; font-weight: 700; color: var(--primary-color); }
     
-    /* 空状态 */
-    .empty-orders { 
-      text-align: center; 
-      padding: 60px 20px; 
-      color: var(--text-light); 
-    }
-    .empty-orders i { 
-      font-size: 4rem; 
-      margin-bottom: 20px; 
-      opacity: 0.3; 
-    }
+    .empty-orders { text-align: center; padding: 60px 20px; color: var(--text-light); }
+    .empty-orders i { font-size: 4rem; margin-bottom: 20px; opacity: 0.3; }
     
-    /* 底部导航 */
     .bottom-nav { 
-      position: fixed; 
-      bottom: 0; 
-      left: 0; 
-      right: 0; 
-      background: var(--card-bg); 
-      display: flex; 
-      justify-content: space-around; 
-      padding: 10px 0; 
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
-      z-index: 1000; 
+      position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); 
+      display: flex; justify-content: space-around; padding: 10px 0; 
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; 
     }
     .nav-item { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 4px; 
-      font-size: 0.8rem; 
-      color: var(--text-light); 
-      cursor: pointer; 
+      display: flex; flex-direction: column; align-items: center; gap: 4px; 
+      font-size: 0.8rem; color: var(--text-light); cursor: pointer; 
     }
-    .nav-item.active { 
-      color: var(--primary-color); 
-    }
-    .nav-item i { 
-      font-size: 1.2rem; 
-    }
+    .nav-item.active { color: var(--primary-color); }
+    .nav-item i { font-size: 1.2rem; }
     
-    /* 订单详情弹窗 */
     .order-detail-overlay { 
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      right: 0; 
-      bottom: 0; 
-      background: rgba(0,0,0,0.6); 
-      display: flex; 
-      align-items: flex-end; 
-      z-index: 9999; 
-      opacity: 0; 
-      pointer-events: none; 
-      transition: opacity 0.3s; 
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); 
+      display: flex; align-items: flex-end; z-index: 9999; opacity: 0; 
+      pointer-events: none; transition: opacity 0.3s; 
     }
-    .order-detail-overlay.show { 
-      opacity: 1; 
-      pointer-events: auto; 
-    }
+    .order-detail-overlay.show { opacity: 1; pointer-events: auto; }
     .order-detail-panel { 
-      background: var(--card-bg); 
-      border-radius: 16px 16px 0 0; 
-      width: 100%; 
-      max-height: 85vh; 
-      overflow-y: auto; 
-      transform: translateY(100%); 
-      transition: transform 0.3s; 
+      background: var(--card-bg); border-radius: 16px 16px 0 0; width: 100%; 
+      max-height: 85vh; overflow-y: auto; transform: translateY(100%); transition: transform 0.3s; 
     }
-    .order-detail-overlay.show .order-detail-panel { 
-      transform: translateY(0); 
-    }
+    .order-detail-overlay.show .order-detail-panel { transform: translateY(0); }
     .detail-header { 
-      padding: 20px; 
-      border-bottom: 1px solid #eee; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
+      padding: 20px; border-bottom: 1px solid #eee; 
+      display: flex; justify-content: space-between; align-items: center; 
     }
-    .detail-title { 
-      font-size: 1.2rem; 
-      font-weight: 700; 
-    }
+    .detail-title { font-size: 1.2rem; font-weight: 700; }
     .close-btn { 
-      width: 36px; 
-      height: 36px; 
-      border-radius: 50%; 
-      border: none; 
-      background: #f0f0f0; 
-      font-size: 1.5rem; 
-      cursor: pointer; 
-      color: var(--text-light); 
+      width: 36px; height: 36px; border-radius: 50%; border: none; 
+      background: #f0f0f0; font-size: 1.5rem; cursor: pointer; color: var(--text-light); 
     }
     .detail-body { padding: 20px; }
     .detail-row { 
-      display: flex; 
-      justify-content: space-between; 
-      margin-bottom: 12px; 
-      padding: 8px 0; 
-      border-bottom: 1px solid #f5f5f5; 
+      display: flex; justify-content: space-between; margin-bottom: 12px; 
+      padding: 8px 0; border-bottom: 1px solid #f5f5f5; 
     }
-    .detail-label { 
-      color: var(--text-light); 
-    }
-    .detail-value { 
-      font-weight: 600; 
-    }
+    .detail-label { color: var(--text-light); }
+    .detail-value { font-weight: 600; }
     
-    /* 加载状态 */
-    .loading { 
-      text-align: center; 
-      padding: 40px; 
-      color: var(--text-light); 
+    .loading { text-align: center; padding: 40px; color: var(--text-light); }
+    .loading i { font-size: 2rem; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* ═══════════════════════════════════════════
+       🎮 CUSTOM GAME NOTIFICATION SYSTEM
+    ═══════════════════════════════════════════ */
+    
+    #game-notify-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
     }
-    .loading i { 
-      font-size: 2rem; 
-      animation: spin 1s linear infinite; 
+
+    #game-notify-container.visible {
+      pointer-events: auto;
+      opacity: 1;
     }
-    @keyframes spin { 
-      0% { transform: rotate(0deg); } 
-      100% { transform: rotate(360deg); } 
+
+    /* Backdrop */
+    .gn-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 0, 20, 0.75);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
+
+    /* Card */
+    .gn-card {
+      position: relative;
+      z-index: 1;
+      width: min(360px, 88vw);
+      background: #0f0a2e;
+      border-radius: 20px;
+      padding: 36px 28px 28px;
+      text-align: center;
+      transform: scale(0.85) translateY(20px);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+      overflow: hidden;
+      border: 1px solid rgba(108, 99, 255, 0.3);
+    }
+
+    #game-notify-container.visible .gn-card {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    /* Glowing border effect */
+    .gn-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 21px;
+      padding: 1px;
+      background: linear-gradient(135deg, #6C63FF, #FF6584, #6C63FF);
+      background-size: 200% 200%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: borderRotate 3s linear infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes borderRotate {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Scanline overlay */
+    .gn-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(108, 99, 255, 0.03) 2px,
+        rgba(108, 99, 255, 0.03) 4px
+      );
+      pointer-events: none;
+      border-radius: 20px;
+    }
+
+    /* Icon orb */
+    .gn-icon-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      margin-bottom: 20px;
+    }
+
+    .gn-icon-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #7b6fff, #3a1f8f);
+      box-shadow:
+        0 0 20px rgba(108, 99, 255, 0.6),
+        0 0 40px rgba(108, 99, 255, 0.3),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+      animation: orbPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes orbPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(108, 99, 255, 0.6), 0 0 40px rgba(108, 99, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
+      50% { box-shadow: 0 0 30px rgba(108, 99, 255, 0.9), 0 0 60px rgba(108, 99, 255, 0.5), inset 0 1px 0 rgba(255,255,255,0.2); }
+    }
+
+    .gn-icon {
+      position: relative;
+      z-index: 1;
+      font-size: 1.8rem;
+      color: #fff;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.6));
+    }
+
+    /* Floating particles */
+    .gn-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: 20px;
+    }
+
+    .gn-particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #6C63FF;
+      animation: float var(--dur) var(--delay) ease-in-out infinite;
+      left: var(--x);
+      top: 110%;
+      opacity: 0;
+    }
+
+    @keyframes float {
+      0% { top: 110%; opacity: 0; transform: translateX(0) scale(1); }
+      20% { opacity: 0.8; }
+      80% { opacity: 0.4; }
+      100% { top: -10%; opacity: 0; transform: translateX(var(--drift)) scale(0.5); }
+    }
+
+    /* Title */
+    .gn-tag {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #FF6584;
+      background: rgba(255, 101, 132, 0.12);
+      border: 1px solid rgba(255, 101, 132, 0.3);
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .gn-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+
+    .gn-message {
+      font-size: 0.9rem;
+      color: rgba(200, 195, 255, 0.85);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    /* Confirm button */
+    .gn-btn {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      padding: 13px 24px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #fff;
+      background: linear-gradient(135deg, #6C63FF 0%, #9b5de5 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.5);
+    }
+
+    .gn-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .gn-btn:hover::before { left: 160%; }
+
+    .gn-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(108, 99, 255, 0.7);
+    }
+
+    .gn-btn:active { transform: translateY(0px) scale(0.98); }
+
+    /* Corner decorations */
+    .gn-corner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      opacity: 0.5;
+    }
+    .gn-corner.tl { top: 12px; left: 12px; border-top: 2px solid #6C63FF; border-left: 2px solid #6C63FF; }
+    .gn-corner.tr { top: 12px; right: 12px; border-top: 2px solid #6C63FF; border-right: 2px solid #6C63FF; }
+    .gn-corner.bl { bottom: 12px; left: 12px; border-bottom: 2px solid #6C63FF; border-left: 2px solid #6C63FF; }
+    .gn-corner.br { bottom: 12px; right: 12px; border-bottom: 2px solid #6C63FF; border-right: 2px solid #6C63FF; }
+
+    /* Type variants */
+    .gn-card.type-warning .gn-icon-bg {
+      background: radial-gradient(circle at 40% 35%, #ffb347, #c87700);
+      box-shadow: 0 0 20px rgba(255, 179, 71, 0.6), 0 0 40px rgba(255, 179, 71, 0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .gn-card.type-warning .gn-corner { border-color: #ffb347; }
+    .gn-card.type-warning .gn-btn { background: linear-gradient(135deg, #e67e22, #f39c12); box-shadow: 0 4px 20px rgba(230, 126, 34, 0.5); }
+    .gn-card.type-warning .gn-tag { color: #ffb347; background: rgba(255, 179, 71, 0.12); border-color: rgba(255, 179, 71, 0.3); }
+
+    .gn-card.type-error .gn-icon-bg {
+      background: radial-gradient(circle at 40% 35%, #ff4757, #c0392b);
+      box-shadow: 0 0 20px rgba(255, 71, 87, 0.6), 0 0 40px rgba(255, 71, 87, 0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .gn-card.type-error .gn-corner { border-color: #ff4757; }
+    .gn-card.type-error .gn-btn { background: linear-gradient(135deg, #ff4757, #c0392b); box-shadow: 0 4px 20px rgba(255, 71, 87, 0.5); }
+    .gn-card.type-error .gn-tag { color: #ff4757; background: rgba(255, 71, 87, 0.12); border-color: rgba(255, 71, 87, 0.3); }
+
+    .gn-card.type-success .gn-icon-bg {
+      background: radial-gradient(circle at 40% 35%, #2ecc71, #1a8a4a);
+      box-shadow: 0 0 20px rgba(46, 204, 113, 0.6), 0 0 40px rgba(46, 204, 113, 0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .gn-card.type-success .gn-corner { border-color: #2ecc71; }
+    .gn-card.type-success .gn-btn { background: linear-gradient(135deg, #2ecc71, #27ae60); box-shadow: 0 4px 20px rgba(46, 204, 113, 0.5); }
+    .gn-card.type-success .gn-tag { color: #2ecc71; background: rgba(46, 204, 113, 0.12); border-color: rgba(46, 204, 113, 0.3); }
   </style>
 </head>
 <body>
@@ -407,30 +489,128 @@
     </div>
   </div>
 
+  <!-- 🎮 GAME NOTIFICATION MODAL -->
+  <div id="game-notify-container">
+    <div class="gn-backdrop" id="gn-backdrop"></div>
+    <div class="gn-card" id="gn-card">
+      <!-- Scanline + border already via ::after/::before -->
+      <div class="gn-particles" id="gn-particles"></div>
+      <div class="gn-corner tl"></div>
+      <div class="gn-corner tr"></div>
+      <div class="gn-corner bl"></div>
+      <div class="gn-corner br"></div>
+
+      <div class="gn-icon-wrap">
+        <div class="gn-icon-bg"></div>
+        <i class="gn-icon fas fa-lock" id="gn-icon"></i>
+      </div>
+
+      <div class="gn-tag" id="gn-tag">SYSTEM ALERT</div>
+      <div class="gn-title" id="gn-title">Login Required</div>
+      <div class="gn-message" id="gn-message">Please log in to view your orders.</div>
+
+      <button class="gn-btn" id="gn-btn" onclick="gnConfirm()">
+        <span id="gn-btn-text">OK</span>
+      </button>
+    </div>
+  </div>
+
   <script>
+    // ═══════════════════════════════════════════
+    // 🎮 GAME NOTIFICATION SYSTEM
+    // ═══════════════════════════════════════════
+    
+    let gnCallback = null;
+
+    function gameNotify({ type = 'info', tag, title, message, btnText = 'OK', icon, onConfirm }) {
+      const container = document.getElementById('game-notify-container');
+      const card = document.getElementById('gn-card');
+
+      // Reset type classes
+      card.className = 'gn-card';
+      if (type === 'warning') card.classList.add('type-warning');
+      else if (type === 'error') card.classList.add('type-error');
+      else if (type === 'success') card.classList.add('type-success');
+
+      // Set content
+      document.getElementById('gn-tag').textContent = tag || (type === 'warning' ? 'WARNING' : type === 'error' ? 'ERROR' : type === 'success' ? 'SUCCESS' : 'SYSTEM ALERT');
+      document.getElementById('gn-title').textContent = title || 'Notice';
+      document.getElementById('gn-message').textContent = message || '';
+      document.getElementById('gn-btn-text').textContent = btnText;
+
+      const iconEl = document.getElementById('gn-icon');
+      iconEl.className = 'gn-icon fas ' + (icon || (type === 'warning' ? 'fa-exclamation-triangle' : type === 'error' ? 'fa-times-circle' : type === 'success' ? 'fa-check-circle' : 'fa-lock'));
+
+      // Spawn particles
+      const pContainer = document.getElementById('gn-particles');
+      pContainer.innerHTML = '';
+      const colors = type === 'warning' ? ['#ffb347','#ffd700'] : type === 'error' ? ['#ff4757','#ff6b81'] : type === 'success' ? ['#2ecc71','#1abc9c'] : ['#6C63FF','#FF6584','#a78bfa'];
+      for (let i = 0; i < 14; i++) {
+        const p = document.createElement('div');
+        p.className = 'gn-particle';
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const size = 2 + Math.random() * 3;
+        p.style.cssText = `
+          --x: ${Math.random() * 100}%;
+          --dur: ${2.5 + Math.random() * 2.5}s;
+          --delay: ${Math.random() * 3}s;
+          --drift: ${(Math.random() - 0.5) * 60}px;
+          width: ${size}px; height: ${size}px;
+          background: ${color};
+          box-shadow: 0 0 ${size * 2}px ${color};
+        `;
+        pContainer.appendChild(p);
+      }
+
+      gnCallback = onConfirm || null;
+      container.classList.add('visible');
+    }
+
+    function gnConfirm() {
+      const container = document.getElementById('game-notify-container');
+      const card = document.getElementById('gn-card');
+      card.style.transform = 'scale(0.9) translateY(10px)';
+      card.style.opacity = '0';
+      setTimeout(() => {
+        container.classList.remove('visible');
+        card.style.transform = '';
+        card.style.opacity = '';
+        if (gnCallback) gnCallback();
+      }, 250);
+    }
+
+    // Close on backdrop click
+    document.getElementById('gn-backdrop').addEventListener('click', gnConfirm);
+
+    // ═══════════════════════════════════════════
+    // ORDERS LOGIC
+    // ═══════════════════════════════════════════
+
     let orders = [];
     let currentFilter = 'all';
     let currentUser = null;
 
-    // 🔐 检查登录状态（关键安全修复）
     async function checkAuth() {
       const { data: { session }, error: sessionError } = await db.auth.getSession();
       
       if (sessionError || !session) {
-        // 未登录，显示提示并跳转
-        alert(t('orders.loginRequired') || '⚠️ 请先登录');
-        window.location.href = 'profile.html';
+        gameNotify({
+          type: 'warning',
+          tag: 'AUTH REQUIRED',
+          title: 'Login Required',
+          message: t('orders.loginRequired') || 'Please log in to view your orders and order history.',
+          btnText: 'GO TO LOGIN',
+          icon: 'fa-shield-alt',
+          onConfirm: () => { window.location.href = 'profile.html'; }
+        });
         return null;
       }
       
       currentUser = session.user;
-      console.log('✅ 当前用户:', currentUser.id);
       return currentUser;
     }
 
-    // 🔐 加载订单（只加载当前用户的）
     async function loadOrders() {
-      // 🔴 关键：先检查登录
       const user = await checkAuth();
       if (!user) return;
       
@@ -438,39 +618,35 @@
       const empty = document.getElementById('emptyOrders');
       
       try {
-        // 🔴 关键：使用 user_id 过滤，只显示当前用户的订单
         const { data, error } = await db
           .from('orders')
           .select('*')
-          .eq('user_id', user.id)  // 🔴 必须过滤当前用户
+          .eq('user_id', user.id)
           .order('created_at', { ascending: false });
         
         if (error) throw error;
         
         orders = data || [];
-        console.log(`✅ 加载了 ${orders.length} 个订单`);
-        
         renderOrders();
         
       } catch (err) {
         console.error('加载订单失败:', err);
-        list.innerHTML = `
-          <div class="empty-orders">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>加载失败</h3>
-            <p>请刷新页面重试</p>
-            <button onclick="loadOrders()" style="margin-top: 20px; padding: 10px 30px; background: var(--primary-color); color: white; border: none; border-radius: 20px; cursor: pointer;">重试</button>
-          </div>
-        `;
+        gameNotify({
+          type: 'error',
+          tag: 'LOAD ERROR',
+          title: 'Failed to Load',
+          message: 'Could not retrieve your orders. Please try again.',
+          btnText: 'RETRY',
+          icon: 'fa-exclamation-circle',
+          onConfirm: loadOrders
+        });
       }
     }
 
-    // 渲染订单列表
     function renderOrders() {
       const list = document.getElementById('orderList');
       const empty = document.getElementById('emptyOrders');
       
-      // 应用筛选
       let filtered = orders;
       if (currentFilter !== 'all') {
         filtered = orders.filter(o => o.status === currentFilter);
@@ -488,23 +664,11 @@
         let statusClass = 'status-pending';
         let statusText = t('orders.status.pending');
         
-        if (order.status === 'completed') {
-          statusClass = 'status-completed';
-          statusText = t('orders.status.completed');
-        } else if (order.status === 'cancelled') {
-          statusClass = 'status-cancelled';
-          statusText = t('orders.status.cancelled');
-        } else if (order.status === 'refunded') {
-          statusClass = 'status-refunded';
-          statusText = t('orders.status.refunded') || '已退款';
-        }
+        if (order.status === 'completed') { statusClass = 'status-completed'; statusText = t('orders.status.completed'); }
+        else if (order.status === 'cancelled') { statusClass = 'status-cancelled'; statusText = t('orders.status.cancelled'); }
+        else if (order.status === 'refunded') { statusClass = 'status-refunded'; statusText = t('orders.status.refunded') || '已退款'; }
         
-        const timeStr = new Date(order.created_at).toLocaleString('zh-CN', { 
-          month: 'short', 
-          day: 'numeric', 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        });
+        const timeStr = new Date(order.created_at).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         
         return `
           <div class="order-card" onclick="showDetail('${order.id}')">
@@ -531,7 +695,6 @@
       }).join('');
     }
 
-    // 显示订单详情
     async function showDetail(orderId) {
       const order = orders.find(o => o.id === orderId);
       if (!order) return;
@@ -544,74 +707,48 @@
       const timeStr = new Date(order.created_at).toLocaleString('zh-CN');
       
       document.getElementById('detailContent').innerHTML = `
-        <div class="detail-row">
-          <span class="detail-label" data-i18n="orders.detail.id">订单编号</span>
-          <span class="detail-value">${order.id}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label" data-i18n="orders.detail.status">订单状态</span>
-          <span class="detail-value">${statusText}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label" data-i18n="orders.detail.time">下单时间</span>
-          <span class="detail-value">${timeStr}</span>
-        </div>
-        ${order.game_account ? `
-        <div class="detail-row">
-          <span class="detail-label" data-i18n="orders.detail.account">充值账号</span>
-          <span class="detail-value">${order.game_account}</span>
-        </div>
-        ` : ''}
-        ${order.payment_method ? `
-        <div class="detail-row">
-          <span class="detail-label" data-i18n="orders.detail.payment">支付方式</span>
-          <span class="detail-value">${order.payment_method}</span>
-        </div>
-        ` : ''}
-        ${order.coupon_code ? `
-        <div class="detail-row">
-          <span class="detail-label" data-i18n="orders.detail.coupon">优惠券</span>
-          <span class="detail-value">${order.coupon_code}</span>
-        </div>
-        ` : ''}
-        ${order.discount ? `
-        <div class="detail-row">
-          <span class="detail-label" data-i18n="orders.detail.discount">优惠金额</span>
-          <span class="detail-value" style="color: var(--success-color);">-${SITE_CONFIG?.currency || '¥'}${order.discount.toFixed(2)}</span>
-        </div>
-        ` : ''}
+        <div class="detail-row"><span class="detail-label">订单编号</span><span class="detail-value">${order.id}</span></div>
+        <div class="detail-row"><span class="detail-label">订单状态</span><span class="detail-value">${statusText}</span></div>
+        <div class="detail-row"><span class="detail-label">下单时间</span><span class="detail-value">${timeStr}</span></div>
+        ${order.game_account ? `<div class="detail-row"><span class="detail-label">充值账号</span><span class="detail-value">${order.game_account}</span></div>` : ''}
+        ${order.payment_method ? `<div class="detail-row"><span class="detail-label">支付方式</span><span class="detail-value">${order.payment_method}</span></div>` : ''}
+        ${order.coupon_code ? `<div class="detail-row"><span class="detail-label">优惠券</span><span class="detail-value">${order.coupon_code}</span></div>` : ''}
+        ${order.discount ? `<div class="detail-row"><span class="detail-label">优惠金额</span><span class="detail-value" style="color: var(--success-color);">-${SITE_CONFIG?.currency || '¥'}${order.discount.toFixed(2)}</span></div>` : ''}
         <div class="detail-row" style="font-size: 1.2rem; border-top: 2px solid #eee; padding-top: 15px; margin-top: 15px;">
-          <span class="detail-label" data-i18n="orders.detail.total">订单总额</span>
+          <span class="detail-label">订单总额</span>
           <span class="detail-value" style="color: var(--primary-color);">${SITE_CONFIG?.currency || '¥'}${order.total?.toFixed(2) || '0.00'}</span>
         </div>
         ${order.status === 'pending' ? `
         <div style="margin-top: 20px; display: flex; gap: 10px;">
-          <button onclick="cancelOrder('${order.id}')" style="flex: 1; padding: 12px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer;" data-i18n="orders.btn.cancel">取消订单</button>
-          <button onclick="payOrder('${order.id}')" style="flex: 1; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer;" data-i18n="orders.btn.pay">去支付</button>
-        </div>
-        ` : ''}
+          <button onclick="cancelOrder('${order.id}')" style="flex: 1; padding: 12px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer;">取消订单</button>
+          <button onclick="payOrder('${order.id}')" style="flex: 1; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer;">去支付</button>
+        </div>` : ''}
       `;
       
       document.getElementById('detailOverlay').classList.add('show');
     }
 
-    // 关闭详情弹窗
-    window.closeDetail = function() {
-      document.getElementById('detailOverlay').classList.remove('show');
-    };
+    window.closeDetail = function() { document.getElementById('detailOverlay').classList.remove('show'); };
 
-    // 取消订单
     window.cancelOrder = async function(orderId) {
-      if (!confirm('确定要取消这个订单吗？')) return;
-      const order = orders.find(o => o.id === orderId);
-      if (order) {
-        await db.from('orders').update({ status: 'cancelled' }).eq('id', orderId);
-        await loadOrders();
-        closeDetail();
-      }
+      gameNotify({
+        type: 'warning',
+        tag: 'CONFIRM ACTION',
+        title: 'Cancel Order?',
+        message: 'Are you sure you want to cancel this order? This action cannot be undone.',
+        btnText: 'CANCEL ORDER',
+        icon: 'fa-trash-alt',
+        onConfirm: async () => {
+          const order = orders.find(o => o.id === orderId);
+          if (order) {
+            await db.from('orders').update({ status: 'cancelled' }).eq('id', orderId);
+            await loadOrders();
+            closeDetail();
+          }
+        }
+      });
     };
 
-    // 支付订单
     window.payOrder = function(orderId) {
       const order = orders.find(o => o.id === orderId);
       if (order) {
@@ -620,7 +757,6 @@
       }
     };
 
-    // 标签筛选
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -630,12 +766,10 @@
       });
     });
 
-    // 点击遮罩关闭
     document.getElementById('detailOverlay').addEventListener('click', function(e) {
       if (e.target === this) closeDetail();
     });
 
-    // 页面加载
     document.addEventListener('DOMContentLoaded', () => {
       loadOrders();
       const savedTheme = localStorage.getItem('theme') || 'light';
